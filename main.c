@@ -48,6 +48,7 @@ void activate_cb(const char *seq, const char *req, void *arg)
     if (key)
     {
         printf("Matching License Key: %s\n", key);
+        activate_key(key);
     }
     else
     {
@@ -55,6 +56,7 @@ void activate_cb(const char *seq, const char *req, void *arg)
         webview_terminate(w);
         exit(1);
     }
+
 #else
     printf("Unsupported OS\n");
 #endif

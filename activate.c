@@ -92,3 +92,22 @@ char *get_license_key(const char *edition_id)
 
     return NULL;
 }
+
+void activate_key(const char *key)
+{
+    char command[64];
+    snprintf(command, sizeof(command), "/c slmgr /ipk %s", key);
+
+    SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
+    shExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+    shExecInfo.lpVerb = "runas";
+    shExecInfo.lpFile = "cmd.exe";
+    shExecInfo.lpParameters = command;
+    shExecInfo.nShow = SW_HIDE;
+
+    if (ShellExecuteEx(&shExecInfo))
+    {
+        WaitForSingleObject(shExecInfo.hProcess, INFINITE);
+        CloseHandle(shExecInfo.hProcess);
+    }
+}
