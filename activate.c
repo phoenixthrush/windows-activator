@@ -111,3 +111,37 @@ void activate_key(const char *key)
         CloseHandle(shExecInfo.hProcess);
     }
 }
+
+char *get_os_product_pfn()
+{
+    static char osProductPfn[256];
+    HKEY hKey;
+    DWORD size = sizeof(osProductPfn);
+
+    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\ProductOptions", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+    {
+        if (RegQueryValueEx(hKey, "OSProductPfn", NULL, NULL, (LPBYTE)osProductPfn, &size) == ERROR_SUCCESS)
+        {
+            RegCloseKey(hKey);
+            return osProductPfn;
+        }
+        RegCloseKey(hKey);
+    }
+    return NULL;
+}
+
+void run_command(const char *command)
+{
+    SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
+    shExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+    shExecInfo.lpVerb = "runas";
+    shExecInfo.lpFile = "cmd.exe";
+    shExecInfo.lpParameters = command;
+    shExecInfo.nShow = SW_HIDE;
+
+    if (ShellExecuteEx(&shExecInfo))
+    {
+        WaitForSingleObject(shExecInfo.hProcess, INFINITE);
+        CloseHandle(shExecInfo.hProcess);
+    }
+}

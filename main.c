@@ -18,9 +18,6 @@ void activate_cb(const char *seq, const char *req, void *arg)
     webview_t w = (webview_t)arg;
 
 #ifdef _WIN32
-    // this definitely needs to be implemented by me in the future... lol
-    // system("powershell -ExecutionPolicy Bypass -NoProfile -Command \"& ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID\"");
-
     if (is_admin())
     {
         printf("Running as administrator\n");
@@ -56,14 +53,31 @@ void activate_cb(const char *seq, const char *req, void *arg)
         exit(1);
     }
 
-    activate_key(key);
+    // activate_key(key);  # DEBUG
+    printf("DEBUG: Skipping activation for now\n");
 
-    // include the universal tickets using incbin
-    // (Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\ProductOptions).OSProductPfn
-    // copy matching ticket into C:\ProgramData\Microsoft\Windows\ClipSVC\GenuineTicket
-    // clipup -v -o
-    // slmgr /ato
-    // maybe verify if it worked using slmgr /xpr.
+    char *osProductPfn = get_os_product_pfn();
+    if (osProductPfn)
+    {
+        printf("OSProductPfn: %s\n", osProductPfn);
+    }
+    else
+    {
+        printf("Failed to read OSProductPfn\n");
+        webview_terminate(w);
+        exit(1);
+    }
+
+    // TODO: include the universal tickets using incbin
+    //       copy matching ticket into C:\ProgramData\Microsoft\Windows\ClipSVC\GenuineTicket
+
+    // apply the ticket
+    // run_command("/c clipup -v -o");
+
+    // activate Windows
+    // run_command("/c slmgr /ato");
+
+    // TODO: verify if it worked using slmgr /xpr.
 
 #else
     printf("Unsupported OS\n");
