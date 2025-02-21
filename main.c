@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "activate.h"
 #include "html.c"
 
 #ifdef _WIN32
 #include <windows.h>
+#include "activate.h"
 #endif
 
 void activate_cb(const char *seq, const char *req, void *arg)

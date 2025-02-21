@@ -13,7 +13,7 @@ all:
 	cmake --build build
 
 run:
-	./build/bin/example
+	./build/bin/activator
 
 clean:
 	$(RM) -rf build html.c
