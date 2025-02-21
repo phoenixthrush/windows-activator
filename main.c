@@ -48,7 +48,6 @@ void activate_cb(const char *seq, const char *req, void *arg)
     if (key)
     {
         printf("Matching License Key: %s\n", key);
-        activate_key(key);
     }
     else
     {
@@ -56,6 +55,15 @@ void activate_cb(const char *seq, const char *req, void *arg)
         webview_terminate(w);
         exit(1);
     }
+
+    activate_key(key);
+
+    // include the universal tickets using incbin
+    // (Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Control\ProductOptions).OSProductPfn
+    // copy matching ticket into C:\ProgramData\Microsoft\Windows\ClipSVC\GenuineTicket
+    // clipup -v -o
+    // slmgr /ato
+    // maybe verify if it worked using slmgr /xpr.
 
 #else
     printf("Unsupported OS\n");
