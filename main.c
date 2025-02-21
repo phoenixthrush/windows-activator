@@ -1,10 +1,15 @@
 #include "webview/webview.h"
+
+#define INCBIN_PREFIX g_
+#include "incbin.h"
+
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "html.c"
+// #include "html.c"
+INCBIN(index_html, "site/index.html");
 
 #ifdef _WIN32
 #include <windows.h>
@@ -112,10 +117,17 @@ int main(void)
     webview_set_title(w, "Windows Activation Tool - phoenixthrush");
     webview_set_size(w, 375, 450, WEBVIEW_HINT_FIXED);
 
+    /*
     // null terminate raw data
     char html[site_index_html_len + 1];
     strncpy(html, (const char *)site_index_html, site_index_html_len);
     html[site_index_html_len] = '\0';
+    */
+
+    // Debug: Check if the INCBIN worked
+    printf("g_index_html_len: %zu\n", g_index_html_len); // Debug: Print length of the embedded HTML
+    printf("g_index_html: %p\n", g_index_html);          // Debug: Print pointer to the embedded HTML
+
     webview_set_html(w, html);
 
     webview_bind(w, "activate", activate_cb, NULL);
