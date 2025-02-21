@@ -18,6 +18,7 @@ target_sources(activator PRIVATE main.c)
 
 if(WIN32)
     target_sources(activator PRIVATE activate.c)
+    target_link_libraries(activator PRIVATE urlmon)
 endif()
 
 target_link_libraries(activator PRIVATE webview::core_static)

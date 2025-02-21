@@ -20,11 +20,11 @@ void activate_cb(const char *seq, const char *req, void *arg)
 #ifdef _WIN32
     if (is_admin())
     {
-        printf("Running as administrator\n");
+        MessageBoxA(NULL, "Running as administrator", "Info", MB_OK | MB_ICONINFORMATION);
     }
     else
     {
-        printf("Not running as administrator\n");
+        MessageBoxA(NULL, "Not running as administrator", "Error", MB_OK | MB_ICONERROR);
         webview_terminate(w);
         exit(1);
     }
@@ -32,11 +32,13 @@ void activate_cb(const char *seq, const char *req, void *arg)
     char *edition = get_edition_id();
     if (edition)
     {
-        printf("Edition ID: %s\n", edition);
+        char msg[512];
+        snprintf(msg, sizeof(msg), "Edition ID: %s", edition);
+        MessageBoxA(NULL, msg, "Info", MB_OK | MB_ICONINFORMATION);
     }
     else
     {
-        printf("Failed to retrieve Edition ID\n");
+        MessageBoxA(NULL, "Failed to retrieve Edition ID", "Error", MB_OK | MB_ICONERROR);
         webview_terminate(w);
         exit(1);
     }
@@ -44,38 +46,56 @@ void activate_cb(const char *seq, const char *req, void *arg)
     char *key = get_license_key(edition);
     if (key)
     {
-        printf("Matching License Key: %s\n", key);
+        char msg[512];
+        snprintf(msg, sizeof(msg), "Matching License Key: %s", key);
+        MessageBoxA(NULL, msg, "Info", MB_OK | MB_ICONINFORMATION);
     }
     else
     {
-        printf("No matching license key found\n");
+        MessageBoxA(NULL, "No matching license key found", "Error", MB_OK | MB_ICONERROR);
         webview_terminate(w);
         exit(1);
     }
 
-    // activate_key(key);  # DEBUG
-    printf("DEBUG: Skipping activation for now\n");
+    // activate_key(key);  // DEBUG
+    MessageBoxA(NULL, "DEBUG: Skipping activation", "Debug", MB_OK | MB_ICONINFORMATION);
 
     char *osProductPfn = get_os_product_pfn();
     if (osProductPfn)
     {
-        printf("OSProductPfn: %s\n", osProductPfn);
+        char msg[512];
+        snprintf(msg, sizeof(msg), "OSProductPfn: %s", osProductPfn);
+        MessageBoxA(NULL, msg, "Info", MB_OK | MB_ICONINFORMATION);
     }
     else
     {
-        printf("Failed to read OSProductPfn\n");
+        MessageBoxA(NULL, "Failed to read OSProductPfn", "Error", MB_OK | MB_ICONERROR);
         webview_terminate(w);
         exit(1);
     }
 
-    // TODO: include the universal tickets using incbin
-    //       copy matching ticket into C:\ProgramData\Microsoft\Windows\ClipSVC\GenuineTicket
+    char url[512];
+    snprintf(url, sizeof(url), "https://gist.github.com/phoenixthrush/4c295a1176298a04acd2353aaef8a71e/raw/aeebac03771684b8e04867d76a01604df63076d6/%s.xml", osProductPfn);
+    MessageBoxA(NULL, url, "Downloading to C:\\ProgramData\\Microsoft\\Windows\\ClipSVC\\GenuineTicket", MB_OK | MB_ICONINFORMATION);
+
+    const char *save_path = "C:\\ProgramData\\Microsoft\\Windows\\ClipSVC\\GenuineTicket\\file.xml";
+
+    if (download_file(url, save_path))
+    {
+        MessageBoxA(NULL, "Download successful", "Info", MB_OK | MB_ICONINFORMATION);
+    }
+    else
+    {
+        MessageBoxA(NULL, "Download failed", "Error", MB_OK | MB_ICONERROR);
+    }
 
     // apply the ticket
     // run_command("/c clipup -v -o");
+    MessageBoxA(NULL, "DEBUG: Skipping ticket application", "Debug", MB_OK | MB_ICONINFORMATION);
 
     // activate Windows
     // run_command("/c slmgr /ato");
+    MessageBoxA(NULL, "DEBUG: Skipping activation", "Debug", MB_OK | MB_ICONINFORMATION);
 
     // TODO: verify if it worked using slmgr /xpr.
 

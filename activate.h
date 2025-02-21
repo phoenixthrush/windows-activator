@@ -10,5 +10,6 @@ char *get_license_key(const char *edition_id);
 void activate_key(const char *key);
 char *get_os_product_pfn();
 void run_command(const char *command);
+int download_file(const char *url, const char *path);
 
 #endif // ACTIVATE_H

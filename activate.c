@@ -1,7 +1,10 @@
 // using HWID Activation from https://massgrave.dev/hwid
 
 #include <windows.h>
+#include <urlmon.h>
 #include <stdio.h>
+
+#pragma comment(lib, "urlmon.lib")
 
 typedef struct
 {
@@ -144,4 +147,9 @@ void run_command(const char *command)
         WaitForSingleObject(shExecInfo.hProcess, INFINITE);
         CloseHandle(shExecInfo.hProcess);
     }
+}
+
+int download_file(const char *url, const char *path)
+{
+    return URLDownloadToFileA(NULL, url, path, 0, NULL) == S_OK;
 }
