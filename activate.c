@@ -74,3 +74,21 @@ char *get_edition_id()
     }
     return NULL;
 }
+
+char *get_license_key(const char *edition_id)
+{
+    if (!edition_id)
+    {
+        return NULL;
+    }
+
+    for (size_t i = 0; i < sizeof(keys) / sizeof(keys[0]); i++)
+    {
+        if (strcmp(edition_id, keys[i].editionKey) == 0)
+        {
+            return keys[i].productKey;
+        }
+    }
+
+    return NULL;
+}
