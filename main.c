@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "activate.h"
 #include "html.c"
 
 #ifdef _WIN32
@@ -14,11 +15,24 @@ void activate_cb(const char *seq, const char *req, void *arg)
 {
     (void)seq;
     (void)req;
-    (void)arg;
+    webview_t w = (webview_t)arg;
 
 #ifdef _WIN32
     // this definitely needs to be implemented by me in the future... lol
-    system("powershell -ExecutionPolicy Bypass -NoProfile -Command \"& ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID\"");
+    // system("powershell -ExecutionPolicy Bypass -NoProfile -Command \"& ([ScriptBlock]::Create((irm https://get.activated.win))) /HWID\"");
+
+    if (is_admin())
+    {
+        printf("Running as administrator\n");
+    }
+    else
+    {
+        printf("Not running as administrator\n");
+        webview_terminate(w);
+        exit(1);
+    }
+
+    printf(get_edition_id());
 #else
     printf("Unsupported OS\n");
 #endif
