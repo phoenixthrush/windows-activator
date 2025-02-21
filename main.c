@@ -111,12 +111,7 @@ int main(void)
     webview_t w = webview_create(0, NULL);
     webview_set_title(w, "Windows Activation Tool - phoenixthrush");
     webview_set_size(w, 375, 450, WEBVIEW_HINT_FIXED);
-
-    // null terminate raw data
-    char html[index_modified_html_len + 1];
-    strncpy(html, (const char *)index_modified_html, index_modified_html_len);
-    html[index_modified_html_len] = '\0';
-    webview_set_html(w, html);
+    webview_set_html(w, (const char *)index_modified_html);
 
     webview_bind(w, "activate", activate_cb, NULL);
     webview_bind(w, "credits", credits_cb, NULL);
