@@ -57,25 +57,20 @@ int is_admin()
     return isAdmin;
 }
 
-int get_edition_id()
+char *get_edition_id()
 {
-
+    static char edition[256];
     HKEY hKey;
-    char edition[256];
     DWORD size = sizeof(edition);
 
     if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
     {
         if (RegQueryValueEx(hKey, "EditionID", NULL, NULL, (LPBYTE)edition, &size) == ERROR_SUCCESS)
         {
-            printf("Edition ID: %s\n", edition);
+            RegCloseKey(hKey);
+            return edition;
         }
         RegCloseKey(hKey);
     }
-    else
-    {
-        printf("Failed to open registry key.\n");
-    }
-
-    return 0;
+    return NULL;
 }

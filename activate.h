@@ -5,6 +5,6 @@
 #include <stdio.h>
 
 int is_admin();
-int get_edition_id();
+char *get_edition_id()
 
 #endif // ACTIVATE_H

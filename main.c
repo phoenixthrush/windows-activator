@@ -32,7 +32,17 @@ void activate_cb(const char *seq, const char *req, void *arg)
         exit(1);
     }
 
-    printf(get_edition_id());
+    char *edition = get_edition_id();
+    if (edition)
+    {
+        printf("Edition ID: %s\n", edition);
+    }
+    else
+    {
+        printf("Failed to retrieve Edition ID\n");
+        webview_terminate(w);
+        exit(1);
+    }
 #else
     printf("Unsupported OS\n");
 #endif
