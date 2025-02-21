@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "html.c"
+#include "index.modified.c"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -113,9 +113,9 @@ int main(void)
     webview_set_size(w, 375, 450, WEBVIEW_HINT_FIXED);
 
     // null terminate raw data
-    char html[site_index_html_len + 1];
-    strncpy(html, (const char *)site_index_html, site_index_html_len);
-    html[site_index_html_len] = '\0';
+    char html[index_modified_html_len + 1];
+    strncpy(html, (const char *)index_modified_html, index_modified_html_len);
+    html[index_modified_html_len] = '\0';
     webview_set_html(w, html);
 
     webview_bind(w, "activate", activate_cb, NULL);
