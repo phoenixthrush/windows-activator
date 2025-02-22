@@ -86,7 +86,7 @@ void activate_cb(const char *seq, const char *req, void *arg)
         CreateDirectory(dir, NULL);
     }
 
-    MessageBoxA(NULL, "Downloading MS ADK file to C:\\Files", "Info", MB_OK | MB_ICONINFORMATION);
+    MessageBoxA(NULL, "Downloading MS ADK file to C:\\Files\nThis will take some time, please wait :)", "Info", MB_OK | MB_ICONINFORMATION);
     run_command("/c powershell -c Invoke-WebRequest -Uri 'https://download.microsoft.com/download/9/A/E/9AE69DD5-BA93-44E0-864E-180F5E700AB4/adk/Installers/14f4df8a2a7fc82a4f415cf6a341415d.cab' -OutFile 'C:\\Files\\14f4df8a2a7fc82a4f415cf6a341415d.cab'");
 
     MessageBoxA(NULL, "Expanding ADK files to C:\\Files", "Info", MB_OK | MB_ICONINFORMATION);
@@ -160,7 +160,7 @@ int main(void)
 {
 #endif
     webview_t w = webview_create(0, NULL);
-    webview_set_title(w, "Windows Activation Tool - phoenixthrush");
+    webview_set_title(w, "Windows Activation Tool");
     webview_set_size(w, 375, 450, WEBVIEW_HINT_FIXED);
     webview_set_html(w, (const char *)index_modified_html);
 
