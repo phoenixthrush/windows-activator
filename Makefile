@@ -1,9 +1,3 @@
-ifeq ($(OS), Windows_NT)
-    RM = del /f /q || exit 0
-else
-    RM = rm -rf
-endif
-
 # TODO: Instead of using xxd,
 # 		embed the raw data directly into the binary
 
@@ -18,4 +12,12 @@ run:
 	./build/bin/activator
 
 clean:
-	$(RM) -rf build index.modified.html index.modified.c
+ifeq ($(OS), Windows_NT)
+	if exist build rmdir /s /q build
+	if exist index.modified.html del /f /q index.modified.html
+	if exist index.modified.c del /f /q index.modified.c
+else
+	if [ -d "build" ]; then rm -rf build; fi
+	if [ -f "index.modified.html" ]; then rm -f index.modified.html; fi
+	if [ -f "index.modified.c" ]; then rm -f index.modified.c; fi
+endif
