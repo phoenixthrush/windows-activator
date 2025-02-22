@@ -3,7 +3,7 @@
 
 all:
 ifeq ($(OS),Windows_NT)
-	if not exist site/assets/audio\keygen-Uh-p3TOIrOc.mp3 yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.%(ext)s" "https://www.youtube.com/watch?v=Uh-p3TOIrOc"
+    yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.%(ext)s" "https://www.youtube.com/watch?v=tPY-I3RX10c"
 else
 	if [ ! -f "site/assets/audio/keygen-Uh-p3TOIrOc.mp3" ]; then yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.%(ext)s" "https://www.youtube.com/watch?v=Uh-p3TOIrOc"; fi
 endif
