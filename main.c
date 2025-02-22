@@ -18,7 +18,8 @@ void activate_cb(const char *seq, const char *req, void *arg)
     webview_t w = (webview_t)arg;
 
 #ifdef _WIN32
-    // TODO: check for internet connectivity
+    // TODO: add check for internet connectivity
+
     if (is_admin())
     {
         MessageBoxA(NULL, "Running as administrator", "Info", MB_OK | MB_ICONINFORMATION);
@@ -58,8 +59,10 @@ void activate_cb(const char *seq, const char *req, void *arg)
         exit(1);
     }
 
-    // activate_key(key);  // DEBUG
-    MessageBoxA(NULL, "DEBUG: Skipping activation", "Debug", MB_OK | MB_ICONINFORMATION);
+    MessageBoxA(NULL, "Applying generic Retail/OEM/MAK Key", "Info", MB_OK | MB_ICONINFORMATION);
+    char command[512];
+    snprintf(command, sizeof(command), "/c slmgr /ipk %s", key);
+    run_command(command);
 
     char *osProductPfn = get_os_product_pfn();
     if (osProductPfn)
@@ -76,6 +79,7 @@ void activate_cb(const char *seq, const char *req, void *arg)
     }
 
     // TODO: Generate it from scratch instead
+    /*
     char url[512];
     snprintf(url, sizeof(url), "https://gist.github.com/phoenixthrush/4c295a1176298a04acd2353aaef8a71e/raw/aeebac03771684b8e04867d76a01604df63076d6/%s.xml", osProductPfn);
     MessageBoxA(NULL, url, "Downloading to C:\\ProgramData\\Microsoft\\Windows\\ClipSVC\\GenuineTicket", MB_OK | MB_ICONINFORMATION);
@@ -90,17 +94,54 @@ void activate_cb(const char *seq, const char *req, void *arg)
     {
         MessageBoxA(NULL, "Download failed", "Error", MB_OK | MB_ICONERROR);
     }
+    */
 
-    // apply the ticket
-    // run_command("/c clipup -v -o");
-    MessageBoxA(NULL, "DEBUG: Skipping ticket application", "Debug", MB_OK | MB_ICONINFORMATION);
+    MessageBoxA(NULL, "Creating folder at C:\\Files if not exists", "Info", MB_OK | MB_ICONINFORMATION);
+    const char *dir = "C:\\Files";
+    if (GetFileAttributes(dir) == INVALID_FILE_ATTRIBUTES)
+    {
+        CreateDirectory(dir, NULL);
+    }
 
-    // activate Windows
-    // run_command("/c slmgr /ato");
-    MessageBoxA(NULL, "DEBUG: Skipping activation", "Debug", MB_OK | MB_ICONINFORMATION);
+    MessageBoxA(NULL, "Downloading MS ADK file to C:\\Files", "Info", MB_OK | MB_ICONINFORMATION);
 
-    // TODO: verify if it worked using slmgr /xpr.
+    // TODO: Download is failing, so using a non C way for now...
+    /*
+    if (download_file("https://download.microsoft.com/download/9/A/E/9AE69DD5-BA93-44E0-864E-180F5E700AB4/adk/Installers/14f4df8a2a7fc82a4f415cf6a341415d.cab", dir))
+    {
+        MessageBoxA(NULL, "Download successful", "Info", MB_OK | MB_ICONINFORMATION);
+    }
+    else
+    {
+        MessageBoxA(NULL, "Download failed", "Error", MB_OK | MB_ICONERROR);
+    }
+    */
 
+    run_command("/c powershell -c Invoke-WebRequest -Uri 'https://download.microsoft.com/download/9/A/E/9AE69DD5-BA93-44E0-864E-180F5E700AB4/adk/Installers/14f4df8a2a7fc82a4f415cf6a341415d.cab' -OutFile 'C:\\Files\\14f4df8a2a7fc82a4f415cf6a341415d.cab'");
+
+    MessageBoxA(NULL, "Expanding ADK files to C:\\Files", "Info", MB_OK | MB_ICONINFORMATION);
+    run_command("/c expand C:\\Files\\14f4df8a2a7fc82a4f415cf6a341415d.cab -F:* C:\\Files\\");
+
+    if (rename("C:\\Files\\filf8377e82b29deadca67bc4858ed3fba9", "C:\\Files\\gatherosstate.exe") != 0)
+    {
+        MessageBoxA(NULL, "Failed to rename C:\\Files\\filf8377e82b29deadca67bc4858ed3fba9 to C:\\Files\\gatherosstate.exe", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(w);
+        exit(1);
+    }
+
+    MessageBoxA(NULL, "Patching C:\\Files\\gatherosstate.exe based on GamersOsState", "Info", MB_OK | MB_ICONINFORMATION);
+    run_command("/c powershell -EncodedCommand JABiAHkAdABlAHMAIAAgAD0AIABbAFMAeQBzAHQAZQBtAC4ASQBPAC4ARgBpAGwAZQBdADoAOgBSAGUAYQBkAEEAbABsAEIAeQB0AGUAcwAoACIAQwA6AFwARgBpAGwAZQBzAFwAZwBhAHQAaABlAHIAbwBzAHMAdABhAHQAZQAuAGUAeABlACIAKQAKACQAYgB5AHQAZQBzAFsAMwAyADAAXQAgAD0AIAAwAHgAZgA4AAoAJABiAHkAdABlAHMAWwAzADIAMQBdACAAPQAgADAAeABmAGIACgAkAGIAeQB0AGUAcwBbADMAMgAyAF0AIAA9ACAAMAB4ADAANQAKACQAYgB5AHQAZQBzAFsAMwAyADQAXQAgAD0AIAAwAHgAMAAzAAoAJABiAHkAdABlAHMAWwAxADMANgA3ADIAXQAgAD0AIAAwAHgAMgA1AAoAJABiAHkAdABlAHMAWwAxADMANgA3ADQAXQAgAD0AIAAwAHgANwAzAAoAJABiAHkAdABlAHMAWwAxADMANgA3ADYAXQAgAD0AIAAwAHgAMwBiAAoAJABiAHkAdABlAHMAWwAxADMANgA3ADgAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAxADMANgA4ADAAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAxADMANgA4ADIAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAxADMANgA4ADQAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIANwA0ADgAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADIANwA0ADkAXQAgAD0AIAAwAHgAOQBlAAoAJABiAHkAdABlAHMAWwAzADIANwA1ADAAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIANwA1ADEAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIANwA1ADIAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIAOAA5ADQAXQAgAD0AIAAwAHgAOABiAAoAJABiAHkAdABlAHMAWwAzADIAOAA5ADUAXQAgAD0AIAAwAHgANAA0AAoAJABiAHkAdABlAHMAWwAzADIAOAA5ADcAXQAgAD0AIAAwAHgANgA0AAoAJABiAHkAdABlAHMAWwAzADIAOAA5ADgAXQAgAD0AIAAwAHgAOAA1AAoAJABiAHkAdABlAHMAWwAzADIAOAA5ADkAXQAgAD0AIAAwAHgAYwAwAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADAAXQAgAD0AIAAwAHgAMABmAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADEAXQAgAD0AIAAwAHgAOAA1AAoAJABiAHkAdABlAHMAWwAzADIAOQAwADIAXQAgAD0AIAAwAHgAMQBjAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADMAXQAgAD0AIAAwAHgAMAAyAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADQAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADYAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADIAOQAwADcAXQAgAD0AIAAwAHgAMwBjAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADgAXQAgAD0AIAAwAHgAMAAxAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADkAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADAAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADEAXQAgAD0AIAAwAHgAOAA1AAoAJABiAHkAdABlAHMAWwAzADIAOQAxADIAXQAgAD0AIAAwAHgAZABiAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADMAXQAgAD0AIAAwAHgANwA1AAoAJABiAHkAdABlAHMAWwAzADIAOQAxADQAXQAgAD0AIAAwAHgAZQBiAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADUAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADIAOQAxADYAXQAgAD0AIAAwAHgANgA5AAoAJABiAHkAdABlAHMAWwAzADIAOQAxADcAXQAgAD0AIAAwAHgAZgBmAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADgAXQAgAD0AIAAwAHgAZgBmAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADkAXQAgAD0AIAAwAHgAZgBmAAoAJABiAHkAdABlAHMAWwAzADMAMAA5ADQAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADMAMAA5ADUAXQAgAD0AIAAwAHgAOAAwAAoAJABiAHkAdABlAHMAWwAzADMAMAA5ADYAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADMAMAA5ADcAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADMAMAA5ADgAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADMANAA0ADkAXQAgAD0AIAAwAHgANgA0AAoAJABiAHkAdABlAHMAWwAzADMANQA3ADYAXQAgAD0AIAAwAHgAOABkAAoAJABiAHkAdABlAHMAWwAzADMANQA3ADcAXQAgAD0AIAAwAHgANQA0AAoAJABiAHkAdABlAHMAWwAzADMANQA3ADkAXQAgAD0AIAAwAHgAMgA0AAoAJABiAHkAdABlAHMAWwAzADMANQA4ADAAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADMANQA4ADEAXQAgAD0AIAAwAHgANQA1AAoAJABiAHkAdABlAHMAWwAzADMANQA4ADIAXQAgAD0AIAAwAHgAMAAxAAoAJABiAHkAdABlAHMAWwAzADMANQA4ADMAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADMANQA4ADQAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADMAOQA3ADgAXQAgAD0AIAAwAHgAYwAzAAoAJABiAHkAdABlAHMAWwAzADQAMQA4ADkAXQAgAD0AIAAwAHgANQA5AAoAJABiAHkAdABlAHMAWwAzADQAMQA5ADAAXQAgAD0AIAAwAHgAZQBiAAoAJABiAHkAdABlAHMAWwAzADQAMQA5ADEAXQAgAD0AIAAwAHgAMgA4AAoAJABiAHkAdABlAHMAWwAzADQAMgAzADgAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADQAMgAzADkAXQAgAD0AIAAwAHgANABmAAoAJABiAHkAdABlAHMAWwAzADQAMgA0ADAAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADQAMgA0ADEAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADQAMgA0ADIAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADQAMwA0ADYAXQAgAD0AIAAwAHgAMgA0AAoAJABiAHkAdABlAHMAWwAzADQAMwA3ADYAXQAgAD0AIAAwAHgAZQBiAAoAJABiAHkAdABlAHMAWwAzADQAMwA3ADcAXQAgAD0AIAAwAHgANgAzAAoAWwBTAHkAcwB0AGUAbQAuAEkATwAuAEYAaQBsAGUAXQA6ADoAVwByAGkAdABlAEEAbABsAEIAeQB0AGUAcwAoACIAQwA6AFwARgBpAGwAZQBzAFwAZwBhAHQAaABlAHIAbwBzAHMAdABhAHQAZQBtAG8AZABpAGYAaQBlAGQALgBlAHgAZQAiACwAIAAkAGIAeQB0AGUAcwApAA==");
+
+    MessageBoxA(NULL, "Generating C:\\Files\\GenuineTicket.xml", "Info", MB_OK | MB_ICONINFORMATION);
+    run_command("/c powershell -c $value = (Get-ItemProperty HKLM:\\SYSTEM\\CurrentControlSet\\Control\\ProductOptions).OSProductPfn; C:\\Files\\gatherosstatemodified.exe /c Pfn=$value`;PKeyIID=465145217131314304264339481117862266242033457260311819664735280");
+
+    MessageBoxA(NULL, "Applying C:\\Files\\GenuineTicket.xml", "Info", MB_OK | MB_ICONINFORMATION);
+    run_command("/c clipup -v -o");
+
+    MessageBoxA(NULL, "Activating Windows", "Info", MB_OK | MB_ICONINFORMATION);
+    run_command("/c slmgr /ato");
+
+    // TODO: add check if it worked using slmgr /xpr.
 #else
     printf("Unsupported OS\n");
 #endif

@@ -1,11 +1,7 @@
 // using HWID Activation from https://massgrave.dev/hwid
 
 #include <windows.h>
-#include <urlmon.h>
 #include <stdio.h>
-
-#pragma comment(lib, "urlmon.lib")
-
 typedef struct
 {
     char *edition;
@@ -96,25 +92,6 @@ char *get_license_key(const char *edition_id)
     return NULL;
 }
 
-void activate_key(const char *key)
-{
-    char command[64];
-    snprintf(command, sizeof(command), "/c slmgr /ipk %s", key);
-
-    SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
-    shExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-    shExecInfo.lpVerb = "runas";
-    shExecInfo.lpFile = "cmd.exe";
-    shExecInfo.lpParameters = command;
-    shExecInfo.nShow = SW_HIDE;
-
-    if (ShellExecuteEx(&shExecInfo))
-    {
-        WaitForSingleObject(shExecInfo.hProcess, INFINITE);
-        CloseHandle(shExecInfo.hProcess);
-    }
-}
-
 char *get_os_product_pfn()
 {
     static char osProductPfn[256];
@@ -133,6 +110,7 @@ char *get_os_product_pfn()
     return NULL;
 }
 
+// TODO: return status on success or failure
 void run_command(const char *command)
 {
     SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
@@ -147,9 +125,4 @@ void run_command(const char *command)
         WaitForSingleObject(shExecInfo.hProcess, INFINITE);
         CloseHandle(shExecInfo.hProcess);
     }
-}
-
-int download_file(const char *url, const char *path)
-{
-    return URLDownloadToFileA(NULL, url, path, 0, NULL) == S_OK;
 }
