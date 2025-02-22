@@ -13,11 +13,12 @@ FetchContent_Declare(
     GIT_TAG master)
 FetchContent_MakeAvailable(webview)
 
-add_executable(activator WIN32)
-target_sources(activator PRIVATE main.c)
-
 if(WIN32)
-    target_sources(activator PRIVATE activate.c)
+    add_executable(activator WIN32)
+    target_sources(activator PRIVATE main.c activate.c resource.rc)
+else()
+    add_executable(activator)
+    target_sources(activator PRIVATE main.c)
 endif()
 
 target_link_libraries(activator PRIVATE webview::core_static)
