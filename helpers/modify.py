@@ -23,7 +23,7 @@ def replace_file_with_base64(match):
 
 
 def modify_content(content):
-    return re.sub(r'src="data:@file/([^"]+)"', replace_file_with_base64, content)
+    return re.sub(r'src="([^"]+)"', replace_file_with_base64, content)
 
 
 def process_html_file(input_filename):
