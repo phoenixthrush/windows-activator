@@ -5,13 +5,20 @@ all:
 ifeq ($(OS),Windows_NT)
     yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.%(ext)s" "https://www.youtube.com/watch?v=tPY-I3RX10c"
 else
-	if [ ! -f "site/assets/audio/keygen-Uh-p3TOIrOc.mp3" ]; then yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.%(ext)s" "https://www.youtube.com/watch?v=Uh-p3TOIrOc"; fi
+	if [ ! -f "site/assets/audio/keygen-Uh-p3TOIrOc.mp3" ]; then yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.%(ext)s" "https://www.youtube.com/watch?v=tPY-I3RX10c"; fi
 endif
 	python helpers/modify.py site/index.html
 	python helpers/xxd.py index.modified.html
 
 	cmake -G Ninja -B build -S . -D CMAKE_BUILD_TYPE=Release
 	cmake --build build
+
+cross: clean
+	python helpers/modify.py site/index.html
+	python helpers/xxd.py index.modified.html
+
+	cmake -G "Ninja Multi-Config" -B build -S . -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/x86_64-w64-mingw32.cmake
+	cmake --build build --config Release
 
 run:
 	./build/bin/activator
