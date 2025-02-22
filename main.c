@@ -18,6 +18,7 @@ void activate_cb(const char *seq, const char *req, void *arg)
     webview_t w = (webview_t)arg;
 
 #ifdef _WIN32
+    // TODO: check for internet connectivity
     if (is_admin())
     {
         MessageBoxA(NULL, "Running as administrator", "Info", MB_OK | MB_ICONINFORMATION);
@@ -74,6 +75,7 @@ void activate_cb(const char *seq, const char *req, void *arg)
         exit(1);
     }
 
+    // TODO: Generate it from scratch instead
     char url[512];
     snprintf(url, sizeof(url), "https://gist.github.com/phoenixthrush/4c295a1176298a04acd2353aaef8a71e/raw/aeebac03771684b8e04867d76a01604df63076d6/%s.xml", osProductPfn);
     MessageBoxA(NULL, url, "Downloading to C:\\ProgramData\\Microsoft\\Windows\\ClipSVC\\GenuineTicket", MB_OK | MB_ICONINFORMATION);
