@@ -16,7 +16,11 @@ def replace_file_with_base64(match):
     file_ext = os.path.splitext(filepath)[1][1:]
     base64_data = encode_file_to_base64(filepath)
     if base64_data:
-        mime_type = f"image/{file_ext}" if file_ext in ["png", "jpg", "jpeg", "gif", "webp"] else "application/octet-stream"
+        mime_type = (
+            f"image/{file_ext}" if file_ext in ["png", "jpg", "jpeg", "gif", "webp"]
+            else "audio/mpeg" if file_ext == "mp3"
+            else "application/octet-stream"
+        )
         return f'src="data:{mime_type};base64,{base64_data}"'
     print(f"Warning: File '{filepath}' not found. Skipping base64 encoding.")
     return match.group(0)
