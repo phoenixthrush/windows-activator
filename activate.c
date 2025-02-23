@@ -126,3 +126,40 @@ void run_command(const char *command)
         CloseHandle(shExecInfo.hProcess);
     }
 }
+
+void set_compatibility_mode(const char *exe_path)
+{
+    HKEY hKey;
+    LONG lResult;
+
+    lResult = RegOpenKeyExA(HKEY_CURRENT_USER,
+                            "Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers",
+                            0,
+                            KEY_WRITE,
+                            &hKey);
+
+    if (lResult != ERROR_SUCCESS)
+    {
+        MessageBoxA(NULL, "Failed to open registry key.", "Error", MB_OK | MB_ICONERROR);
+        return;
+    }
+
+    // set compatibility mode for Windows XP SP3
+    lResult = RegSetValueExA(hKey,
+                             exe_path,
+                             0,
+                             REG_SZ,
+                             (const BYTE *)"WINXPSP3",
+                             strlen("WINXPSP3") + 1);
+
+    if (lResult == ERROR_SUCCESS)
+    {
+        MessageBoxA(NULL, "Compatibility mode set to Windows XP SP3.", "Info", MB_OK | MB_ICONINFORMATION);
+    }
+    else
+    {
+        MessageBoxA(NULL, "Failed to set compatibility mode.", "Error", MB_OK | MB_ICONERROR);
+    }
+
+    RegCloseKey(hKey);
+}
