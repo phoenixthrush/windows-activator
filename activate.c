@@ -152,11 +152,7 @@ void set_compatibility_mode(const char *exe_path)
                              (const BYTE *)"WINXPSP3",
                              strlen("WINXPSP3") + 1);
 
-    if (lResult == ERROR_SUCCESS)
-    {
-        MessageBoxA(NULL, "Compatibility mode set to Windows XP SP3.", "Info", MB_OK | MB_ICONINFORMATION);
-    }
-    else
+    if (lResult != ERROR_SUCCESS)
     {
         MessageBoxA(NULL, "Failed to set compatibility mode.", "Error", MB_OK | MB_ICONERROR);
     }
