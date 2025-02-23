@@ -4,7 +4,7 @@
 ifeq ($(OS),Windows_NT)
 AUDIO_CMD = yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.%%(ext)s" "https://www.youtube.com/watch?v=tPY-I3RX10c"
 else
-AUDIO_CMD = if [ ! -f "site/assets/audio/keygen-Uh-p3TOIrOc.mp3" ]; then yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.%%(ext)s" "https://www.youtube.com/watch?v=tPY-I3RX10c"; fi
+AUDIO_CMD = if [ ! -f "site/assets/audio/keygen-Uh-p3TOIrOc.mp3" ]; then yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.%(ext)s" "https://www.youtube.com/watch?v=tPY-I3RX10c"; fi
 endif
 
 all:
