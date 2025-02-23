@@ -13,16 +13,12 @@ FetchContent_Declare(
     GIT_TAG master)
 FetchContent_MakeAvailable(webview)
 
-set(BUILD_SHARED_LIBS OFF)
-
-if (MINGW)
+if (MINGW OR WIN32)
+    set(BUILD_SHARED_LIBS OFF)
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -static")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -static")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -static")
-endif()
-
-if(WIN32)
     add_executable(activator WIN32)
     target_sources(activator PRIVATE main.c activate.c resource.rc)
 else()
