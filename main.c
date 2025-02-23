@@ -187,6 +187,11 @@ int main(void)
     webview_set_size(w, 375, 450, WEBVIEW_HINT_FIXED);
     webview_set_html(w, (const char *)index_modified_html);
 
+    // maybe bypass 1572864 bytes limit in future
+    // https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.core.corewebview2.navigatetostring#remarks
+    // webview_navigate(w, "https://www.phoenixthrush.com/windows-activator/site/");
+    // webview_navigate(w, "file:///Users/phoenixthrush/opt/windows-activator/site/index.html");
+
     webview_bind(w, "activate", activate_cb, NULL);
     webview_bind(w, "credits", credits_cb, NULL);
     webview_bind(w, "quit", quit_cb, w);

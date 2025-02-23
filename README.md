@@ -35,8 +35,7 @@ A simple tool for permanently activating Windows 10/11 using your system's hardw
 
 ## How does it work?
 
-The activator installs a generic Retail/OEM/MAK key and then uses a pre-made universal ticket to obtain a valid digital license.
-In the future, it will generate this ticket from scratch.
+The activator installs a generic Retail, OEM, or MAK key, then patches gatherosstate.exe (downloaded from the MS ADK) via GamersOsState to generate a genuine ticket to create a valid digital license.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -45,3 +44,13 @@ In the future, it will generate this ticket from scratch.
 Not yet, but it may be considered after the main development is complete.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Credits
+
+-   GamersOsState by asdcorp - [GitHub](https://github.com/asdcorp/GamersOsState/)
+
+## TODO
+
+-   [ ] Refactor and complete TODOs in the codebase
+-   [ ] Restructure files and directories
+-   [ ] Implement Office activation

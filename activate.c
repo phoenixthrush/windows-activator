@@ -1,5 +1,3 @@
-// using HWID Activation from https://massgrave.dev/hwid
-
 #include <windows.h>
 #include <stdio.h>
 typedef struct
