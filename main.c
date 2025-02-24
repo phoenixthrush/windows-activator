@@ -178,6 +178,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
     (void)hPrevInst;
     (void)lpCmdLine;
     (void)nCmdShow;
+
+    // only needed on Windows
+    putenv("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--autoplay-policy=no-user-gesture-required");
 #else
 int main(void)
 {
