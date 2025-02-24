@@ -1,5 +1,5 @@
-#ifndef ACTIVATE_H
-#define ACTIVATE_H
+#ifndef HWID_H
+#define HWID_H
 
 #include <windows.h>
 #include <stdio.h>
@@ -11,4 +11,4 @@ int is_admin();
 void run_command(const char *command);
 void set_compatibility_mode(const char *exe_path);
 
-#endif // ACTIVATE_H
+#endif // HWID_H

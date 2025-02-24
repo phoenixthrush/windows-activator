@@ -8,7 +8,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include "activate.h"
+#include "hwid.h"
 #endif
 
 void activate_cb(const char *seq, const char *req, void *arg)
