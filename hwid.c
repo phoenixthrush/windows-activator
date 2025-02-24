@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <stdio.h>
 typedef struct
 {
     char *edition;
@@ -37,22 +36,6 @@ WindowsKey keys[] = {
     {"SE", "CloudEdition", "KY7PN-VR6RX-83W6Y-6DDYQ-T6R4W"},
     {"SE N", "CloudEditionN", "K9VKN-3BGWV-Y624W-MCRMQ-BHDCD"},
     {"Team", "PPIPro", "XKCNC-J26Q9-KFHD2-FKTHY-KD72Y"}};
-
-int is_admin()
-{
-    BOOL isAdmin = FALSE;
-    SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
-    PSID AdministratorsGroup;
-
-    if (AllocateAndInitializeSid(&NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
-                                 DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &AdministratorsGroup))
-    {
-        CheckTokenMembership(NULL, AdministratorsGroup, &isAdmin);
-        FreeSid(AdministratorsGroup);
-    }
-
-    return isAdmin;
-}
 
 char *get_edition_id()
 {
@@ -106,23 +89,6 @@ char *get_os_product_pfn()
         RegCloseKey(hKey);
     }
     return NULL;
-}
-
-// TODO: return status on success or failure
-void run_command(const char *command)
-{
-    SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
-    shExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-    shExecInfo.lpVerb = "runas";
-    shExecInfo.lpFile = "cmd.exe";
-    shExecInfo.lpParameters = command;
-    shExecInfo.nShow = SW_HIDE;
-
-    if (ShellExecuteEx(&shExecInfo))
-    {
-        WaitForSingleObject(shExecInfo.hProcess, INFINITE);
-        CloseHandle(shExecInfo.hProcess);
-    }
 }
 
 void set_compatibility_mode(const char *exe_path)
