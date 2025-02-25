@@ -3,9 +3,11 @@ AUDIO_CMD = yt-dlp -f bestaudio --extract-audio --audio-quality 64K --audio-form
 ifeq ($(OS),Windows_NT)
 	MKDIR = if not exist build mkdir build
 	RMDIR = if exist build rmdir /s /q build
+	DOWNLOAD_WINLIBS = cd build && curl -LO https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.7-12.0.0-msvcrt-r3/winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip && curl -LO https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.7-12.0.0-msvcrt-r3/winlibs-i686-posix-dwarf-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip
 else
     MKDIR = mkdir -p build
     RMDIR = rm -rf build
+	DOWNLOAD_WINLIBS = echo Skipping download of MinGW-w64 winlibs
 endif
 
 all: build
@@ -13,6 +15,7 @@ all: build
 prepare:
 	$(MKDIR)
 	$(AUDIO_CMD)
+	$(DOWNLOAD_WINLIBS)
 
 	python src/helpers/modify.py -i site/index.html -o build/index.modified.html
 	python src/helpers/xxd.py -i build/index.modified.html -o build/index.modified.c

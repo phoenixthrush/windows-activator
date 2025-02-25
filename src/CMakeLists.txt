@@ -6,19 +6,53 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 include(FetchContent)
+include(ExternalProject)
 
 FetchContent_Declare(
     webview
     GIT_REPOSITORY https://github.com/webview/webview
     GIT_TAG master)
 FetchContent_MakeAvailable(webview)
+ 
+#message(STATUS "Downloading MinGW-w64 winlibs, this will take a moment...")
+
+#ExternalProject_Add(
+#    winlibs_x86_64
+#    URL https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.7-12.0.0-msvcrt-r3/winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip
+#    DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/_deps/winlibs
+#    SOURCE_DIR ${CMAKE_BINARY_DIR}/_deps/winlibs/x86_64
+#    CONFIGURE_COMMAND ""
+#    BUILD_COMMAND ""
+#    INSTALL_COMMAND ${CMAKE_COMMAND} -E unzip ${CMAKE_BINARY_DIR}/_deps/winlibs/winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip
+#)
+
+#ExternalProject_Add(
+#    winlibs_i686
+#    URL https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.7-12.0.0-msvcrt-r3/winlibs-i686-posix-dwarf-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip
+#    DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/_deps/winlibs
+#    SOURCE_DIR ${CMAKE_BINARY_DIR}/_deps/winlibs/i686
+#    CONFIGURE_COMMAND ""
+#    BUILD_COMMAND ""
+#    INSTALL_COMMAND ${CMAKE_COMMAND} -E unzip ${CMAKE_BINARY_DIR}/_deps/winlibs/winlibs-i686-posix-dwarf-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip
+#)
 
 if (MINGW OR WIN32)
+    ExternalProject_Add(
+        ohook
+        GIT_REPOSITORY https://github.com/asdcorp/ohook
+        GIT_TAG principalis
+        PREFIX ${CMAKE_BINARY_DIR}/_deps/ohook
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND cd ${CMAKE_BINARY_DIR}/_deps/ohook/src/ohook/ && make
+        INSTALL_COMMAND ""
+    )
+
     set(BUILD_SHARED_LIBS OFF)
     set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -static")
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -static")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -static")
+    
     add_executable(activator WIN32)
     target_sources(activator PRIVATE main.c ${CMAKE_BINARY_DIR}/index.modified.c common.c hwid.c ohook.c resource.rc)
 else()

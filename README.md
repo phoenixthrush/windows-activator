@@ -33,6 +33,12 @@ A simple tool for permanently activating Windows 10/11 using your system's hardw
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Dependencies
+
+-   winget install ffmpeg
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## How does it work?
 
 The activator installs a generic Retail, OEM, or MAK key, then patches gatherosstate.exe (downloaded from the MS ADK) via GamersOsState to generate a genuine ticket to create a valid digital license.
