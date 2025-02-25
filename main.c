@@ -4,13 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "index.modified.c"
-
 #ifdef _WIN32
 #include <windows.h>
 #include "common.h"
 #include "hwid.h"
 #endif
+
+extern unsigned char index_modified_html[];
+extern unsigned int index_modified_html_len;
 
 void activate_cb(const char *seq, const char *req, void *arg)
 {
