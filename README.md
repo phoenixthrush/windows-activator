@@ -14,7 +14,6 @@ A simple tool for permanently activating Windows 10/11 using your system's hardw
 -   Once activated, the license remains stored on Microsoft's servers and cannot be removed from your system
 -   Automatic reactivation after reinstalling Windows, as long as the hardware remains unchanged
 -   Requires an active internet connection
--   Future support for Ohook activation may be added
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -45,14 +44,9 @@ The activator installs a generic Retail, OEM, or MAK key, then patches gatheross
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Is MS Office supported?
-
-Not yet, but it may be considered after the main development is complete.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ## Credits
 
 -   GamersOsState by asdcorp - [GitHub](https://github.com/asdcorp/GamersOsState/)
+-   ohook by asdcorp - [GitHub](https://github.com/asdcorp/ohook/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
