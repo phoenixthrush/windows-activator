@@ -1,7 +1,3 @@
-# TODO: Adjust bitrate and image quality dynamically to stay within the 1,572,864 byte limit
-
-SOURCE_DIR=src
-
 ifeq ($(OS),Windows_NT)
     AUDIO_CMD = yt-dlp -f bestaudio --extract-audio --audio-quality 64K --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.%%(ext)s" "https://www.youtube.com/watch?v=tPY-I3RX10c"
     RM = del /f /q
@@ -16,7 +12,9 @@ else
     RMDIR = if [ -d "build" ]; then rm -rf build; fi
 endif
 
-all:
+all: build
+
+prepare:
 	$(AUDIO_CMD)
 	python src/helpers/modify.py site/index.html
 	python src/helpers/xxd.py index.modified.html
@@ -25,19 +23,13 @@ all:
 	$(RM) index.modified.html
 	$(MOVE) index.modified.c build
 
-	cd $(SOURCE_DIR) && cmake -G Ninja -B ../build -S . -D CMAKE_BUILD_TYPE=Release
-	cd $(SOURCE_DIR) && cmake --build ../build
+build: clean prepare
+	cd src && cmake -G Ninja -B ../build -S . -D CMAKE_BUILD_TYPE=Release -Wno-dev
+	cd src && cmake --build ../build
 
-cross: clean
-	python src/helpers/modify.py site/index.html
-	python src/helpers/xxd.py index.modified.html
-
-	$(MKDIR) build
-	$(RM) index.modified.html
-	$(MOVE) index.modified.c build
-
-	cd $(SOURCE_DIR) && cmake -G "Ninja Multi-Config" -B ../build -S . -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/x86_64-w64-mingw32.cmake -Wno-dev
-	cd $(SOURCE_DIR) && cmake --build ../build --config Release
+cross: clean prepare
+	cd src && cmake -G "Ninja Multi-Config" -B ../build -S . -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/x86_64-w64-mingw32.cmake -Wno-dev
+	cd src && cmake --build ../build --config Release
 
 run:
 	./build/bin/activator
