@@ -1,7 +1,7 @@
 import re
 import base64
 import os
-import sys
+import argparse
 
 
 def encode_file_to_base64(filepath):
@@ -30,18 +30,20 @@ def modify_content(content):
     return re.sub(r'src="([^"]+)"', replace_file_with_base64, content)
 
 
-def process_html_file(input_filename):
+def process_html_file(input_filename, output_filename):
     with open(input_filename, "r", encoding="utf-8") as f:
         original_content = f.read()
     modified_content = modify_content(original_content)
-    modified_html_filename = f"./{os.path.splitext(os.path.basename(input_filename))[0]}.modified.html"
-    with open(modified_html_filename, "w", encoding="utf-8") as f:
+    with open(output_filename, "w", encoding="utf-8") as f:
         f.write(modified_content)
-    print(f"Saved as {modified_html_filename}")
+    print(f"Saved as {output_filename}")
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Usage: {} <input_filename>".format(sys.argv[0]))
-        sys.exit(1)
-    process_html_file(sys.argv[1])
+    parser = argparse.ArgumentParser(description="Convert file references in HTML to base64 data URIs.")
+    parser.add_argument("-i", "--input", required=True, help="The input HTML file to process")
+    parser.add_argument("-o", "--output", required=True, help="The output file where modified HTML will be saved")
+
+    args = parser.parse_args()
+
+    process_html_file(args.input, args.output)
