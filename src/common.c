@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <stdio.h>
 
 int is_admin()
 {
