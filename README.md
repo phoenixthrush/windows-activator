@@ -49,8 +49,4 @@ Not yet, but it may be considered after the main development is complete.
 
 -   GamersOsState by asdcorp - [GitHub](https://github.com/asdcorp/GamersOsState/)
 
-## TODO
-
--   [ ] Refactor and complete TODOs in the codebase
--   [ ] Restructure files and directories
--   [ ] Implement Office activation
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
