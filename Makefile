@@ -1,4 +1,5 @@
 ifeq ($(OS),Windows_NT)
+	SHELL = cmd
 	MKDIR = if not exist build mkdir build
 	RMDIR = if exist build rmdir /s /q build
 
