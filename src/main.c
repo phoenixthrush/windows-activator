@@ -8,6 +8,7 @@
 #include <windows.h>
 #include "common.h"
 #include "hwid.h"
+#include "ohook.h"
 #endif
 
 extern unsigned char index_modified_html[];
@@ -30,6 +31,20 @@ void activate_cb(const char *seq, const char *req, void *arg)
     else
     {
         MessageBoxA(NULL, "Not running as administrator", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(w);
+        exit(1);
+    }
+
+    char *officeEdition = get_office_edition();
+    if (officeEdition)
+    {
+        char message[512];
+        snprintf(message, sizeof(message), "Installed Office Suite: %s", officeEdition);
+        MessageBoxA(NULL, message, "Info", MB_OK | MB_ICONINFORMATION);
+    }
+    else
+    {
+        MessageBoxA(NULL, "Failed to retrieve Office edition", "Error", MB_OK | MB_ICONERROR);
         webview_terminate(w);
         exit(1);
     }

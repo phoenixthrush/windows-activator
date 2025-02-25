@@ -1,3 +1,5 @@
+#include <windows.h>
+
 typedef struct
 {
     char *version;
@@ -242,3 +244,27 @@ struct Software software[] = {
     {"VMware Fusion 13", "MC60H-DWHD5-H80U9-6V85M-8280D"},
     {"VMware Fusion 13", "JU090-6039P-08409-8J0QH-2YR7F"},
     {"VMware Fusion 13", "4Y09U-AJK97-089Z0-A3054-83KLA"}};
+
+char *get_office_edition()
+{
+    HKEY hKey;
+    LPCWSTR subKey = L"SOFTWARE\\Microsoft\\Office\\ClickToRun\\Configuration";
+    LPCWSTR valueName = L"ProductReleaseIds";
+    static char officeEdition[256];
+    WCHAR data[256];
+    DWORD dataSize = sizeof(data);
+
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, subKey, 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+    {
+        if (RegGetValueW(hKey, NULL, valueName, RRF_RT_REG_SZ, NULL, data, &dataSize) == ERROR_SUCCESS)
+        {
+            WideCharToMultiByte(CP_ACP, 0, data, -1, officeEdition, sizeof(officeEdition), NULL, NULL);
+            MessageBoxA(NULL, officeEdition, "Installed Office Suite", MB_OK | MB_ICONINFORMATION);
+            RegCloseKey(hKey);
+            return officeEdition;
+        }
+        RegCloseKey(hKey);
+    }
+    MessageBoxA(NULL, "Failed to retrieve Office edition.", "Error", MB_OK | MB_ICONERROR);
+    return NULL;
+}
