@@ -16,7 +16,6 @@ int is_admin()
     return isAdmin;
 }
 
-// TODO: return status on success or failure
 void run_command(const char *command)
 {
     SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
@@ -30,5 +29,15 @@ void run_command(const char *command)
     {
         WaitForSingleObject(shExecInfo.hProcess, INFINITE);
         CloseHandle(shExecInfo.hProcess);
+    }
+    else
+    {
+        DWORD dwError = GetLastError();
+        char errorMessage[512];
+        snprintf(
+            errorMessage, sizeof(errorMessage),
+            "ShellExecuteEx failed with error %lu\nCommand: %s",
+            dwError, command);
+        MessageBox(NULL, errorMessage, "Error", MB_OK | MB_ICONERROR);
     }
 }
