@@ -19,12 +19,18 @@ ifeq ($(OS),Windows_NT)
 	EXTRACT_WINLIBS = if not exist "$(APPDATA)/winlibs/mingw64" tar -xf "$(WINLIBS_X86_64)" -C "$(APPDATA_WINLIBS_DIR)" && \
 	                  if not exist "$(APPDATA)/winlibs/mingw32" tar -xf "$(WINLIBS_I686)" -C "$(APPDATA_WINLIBS_DIR)"
 
+	DOWNLOAD_OHOOK_DLL = echo Skipping ohook download
+	EXTRACT_OHOOK_DLL = echo Skipping ohook extraction
+
 else
-    MKDIR = mkdir -p build
+    MKDIR = mkdir -p build build/_deps/ohook/src/ohook/
     RMDIR = rm -rf build
 	AUDIO_CMD = [ -f site/assets/audio/keygen-Uh-p3TOIrOc.mp3 ] || yt-dlp -f bestaudio --extract-audio --audio-quality 64K --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.mp3" "https://www.youtube.com/watch?v=tPY-I3RX10c"
 	DOWNLOAD_WINLIBS = echo "Skipping MinGW-w64 winlibs download"
 	EXTRACT_WINLIBS = echo "Skipping MinGW-w64 winlibs extraction"
+
+	DOWNLOAD_OHOOK_DLL = curl -Lo build/ohook.zip https://github.com/asdcorp/ohook/releases/download/0.5/ohook_0.5.zip
+	EXTRACT_OHOOK_DLL = unzip build/ohook.zip -d build/_deps/ohook/src/ohook/
 endif
 
 all: build
@@ -32,8 +38,12 @@ all: build
 prepare:
 	$(MKDIR)
 	$(AUDIO_CMD)
+
 	$(DOWNLOAD_WINLIBS)
 	$(EXTRACT_WINLIBS)
+
+	$(DOWNLOAD_OHOOK_DLL)
+	$(EXTRACT_OHOOK_DLL)
 
 	python src/helpers/modify.py -i site/index.html -o build/index.modified.html
 	python src/helpers/xxd.py -i build/index.modified.html -o build/index.modified.c
