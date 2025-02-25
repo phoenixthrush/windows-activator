@@ -3,6 +3,6 @@
 
 #include <windows.h>
 
-char *get_office_edition()
+char *get_office_edition();
 
 #endif // OHOOK_H
