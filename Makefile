@@ -8,9 +8,12 @@ ifeq ($(OS),Windows_NT)
 	APPDATA_WINLIBS_DIR := $(APPDATA)/winlibs
 	WINLIBS_X86_64 := $(APPDATA)/winlibs/winlibs-x86_64.zip
 	WINLIBS_I686 := $(APPDATA)/winlibs/winlibs-i686.zip
-	WINLIBS_URL_X86_64 := https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.7-12.0.0-msvcrt-r3/winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip
-	WINLIBS_URL_I686 := https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.7-12.0.0-msvcrt-r3/winlibs-i686-posix-dwarf-gcc-14.2.0-mingw-w64msvcrt-12.0.0-r3.zip
 	
+	WINLIBS_LATEST_RELEASE := $(shell powershell -Command "Invoke-RestMethod -Uri https://api.github.com/repos/brechtsanders/winlibs_mingw/releases/latest | Select-String -Pattern 'browser_download_url' | ForEach-Object { \$_ -replace '\"browser_download_url\": \"', '' -replace '\"', '' } | Where-Object { \$_ -match 'winlibs-(x86_64|i686)-.*\.zip' -and \$_ -notmatch 'llvm' -and \$_ -notmatch '\.sha(256|512)$' }")
+
+	WINLIBS_URL_X86_64 := $(shell echo "$(WINLIBS_LATEST_RELEASE)" | findstr x86_64)
+	WINLIBS_URL_I686 := $(shell echo "$(WINLIBS_LATEST_RELEASE)" | findstr i686)
+
 	DOWNLOAD_WINLIBS = if not exist "$(APPDATA_WINLIBS_DIR)" ( \
 		mkdir "$(APPDATA_WINLIBS_DIR)" && \
 		curl -L $(WINLIBS_URL_X86_64) -o "$(WINLIBS_X86_64)" && \
@@ -29,6 +32,11 @@ else
     MKDIR = mkdir -p build build/_deps/ohook/src/ohook/
     RMDIR = rm -rf build
 	AUDIO_CMD = [ -f site/assets/audio/keygen-Uh-p3TOIrOc.mp3 ] || yt-dlp -f bestaudio --extract-audio --audio-quality 64K --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.mp3" "https://www.youtube.com/watch?v=tPY-I3RX10c"
+
+	# WINLIBS_LATEST_RELEASE := $(shell curl -s https://api.github.com/repos/brechtsanders/winlibs_mingw/releases/latest | grep -oE '"browser_download_url": *"[^"]+\.zip"' | cut -d '"' -f4)
+	# WINLIBS_URL_X86_64 := $(shell echo "$(WINLIBS_LATEST_RELEASE)" | grep 'x86_64' | grep -vE 'llvm|\.sha(256|512)$$')
+	# WINLIBS_URL_I686 := $(shell echo "$(WINLIBS_LATEST_RELEASE)" | grep 'i686' | grep -vE 'llvm|\.sha(256|512)$$')
+
 	DOWNLOAD_WINLIBS = echo "Skipping MinGW-w64 winlibs download"
 	EXTRACT_WINLIBS = echo "Skipping MinGW-w64 winlibs extraction"
 
