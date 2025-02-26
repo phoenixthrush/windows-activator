@@ -22,6 +22,7 @@ ifeq ($(OS),Windows_NT)
 
 	DOWNLOAD_OHOOK_DLL = echo Skipping ohook download
 	EXTRACT_OHOOK_DLL = echo Skipping ohook extraction
+	INCLUDE_OHOOK_DLL = echo Skipping ohook inclusion
 
 else
     MKDIR = mkdir -p build build/_deps/ohook/src/ohook/
@@ -32,6 +33,7 @@ else
 
 	DOWNLOAD_OHOOK_DLL = curl -Lo build/ohook.zip https://github.com/asdcorp/ohook/releases/download/0.5/ohook_0.5.zip
 	EXTRACT_OHOOK_DLL = unzip build/ohook.zip -d build/_deps/ohook/src/ohook/
+	INCLUDE_OHOOK_DLL = python src/helpers/xxd.py -i build/_deps/ohook/src/ohook/sppc64.dll -o build/sppc64.dll.c
 endif
 
 all: build
@@ -45,6 +47,7 @@ prepare:
 
 	$(DOWNLOAD_OHOOK_DLL)
 	$(EXTRACT_OHOOK_DLL)
+	$(INCLUDE_OHOOK_DLL)
 
 	python src/helpers/modify.py -i site/index.html -o build/index.modified.html
 	python src/helpers/xxd.py -i build/index.modified.html -o build/index.modified.c

@@ -56,7 +56,7 @@ if (MINGW OR WIN32)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -static")
     
     add_executable(activator WIN32)
-    target_sources(activator PRIVATE main.c ${CMAKE_BINARY_DIR}/index.modified.c common.c hwid.c ohook.c resource.rc)
+    target_sources(activator PRIVATE main.c ${CMAKE_BINARY_DIR}/index.modified.c common.c hwid.c ohook.c sppc64.dll.c resource.rc)
 else()
     add_executable(activator)
     target_sources(activator PRIVATE main.c ${CMAKE_BINARY_DIR}/index.modified.c)

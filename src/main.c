@@ -14,6 +14,27 @@
 extern unsigned char index_modified_html[];
 extern unsigned int index_modified_html_len;
 
+#ifdef _WIN32
+extern unsigned char sppc64_dll[];
+extern unsigned int sppc64_dll_len;
+
+int create_sppc()
+{
+    char path[MAX_PATH];
+    snprintf(path, MAX_PATH, "%s\\Microsoft Office\\root\\vfs\\System\\sppcs.dll", getenv("ProgramFiles"));
+
+    HANDLE hFile = CreateFileA(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hFile == INVALID_HANDLE_VALUE)
+        return 1;
+
+    DWORD written;
+    WriteFile(hFile, sppc64_dll, sppc64_dll_len, &written, NULL);
+    CloseHandle(hFile);
+
+    return (written == sppc64_dll_len) ? 0 : 1;
+}
+#endif
+
 void activate_cb(const char *seq, const char *req, void *arg)
 {
     (void)seq;
