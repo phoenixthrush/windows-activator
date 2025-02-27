@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
 	APPDATA_WINLIBS_DIR := $(APPDATA)/winlibs
 	WINLIBS_X86_64 := $(APPDATA)/winlibs/winlibs-x86_64.zip
 	WINLIBS_I686 := $(APPDATA)/winlibs/winlibs-i686.zip
-	
+
 	WINLIBS_LATEST_RELEASE := $(shell powershell -Command "Invoke-RestMethod -Uri https://api.github.com/repos/brechtsanders/winlibs_mingw/releases/latest | Select-String -Pattern 'browser_download_url' | ForEach-Object { \$_ -replace '\"browser_download_url\": \"', '' -replace '\"', '' } | Where-Object { \$_ -match 'winlibs-(x86_64|i686)-.*\.zip' -and \$_ -notmatch 'llvm' -and \$_ -notmatch '\.sha(256|512)$' }")
 
 	WINLIBS_URL_X86_64 := $(shell echo "$(WINLIBS_LATEST_RELEASE)" | findstr x86_64)
