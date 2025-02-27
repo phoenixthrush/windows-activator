@@ -66,13 +66,13 @@ prepare:
 	python src/helpers/modify.py -i site/index.html -o build/index.modified.html
 	python src/helpers/xxd.py -i build/index.modified.html -o build/index.modified.c
 
-build: clean prepare
+build: prepare
 	cd src && cmake -G Ninja -B ../build -S . -D CMAKE_BUILD_TYPE=Release -Wno-dev
 	cd src && cmake --build ../build
 
 	$(PACK_USING_UPX)
 
-cross: clean prepare
+cross: prepare
 	cd src && cmake -G "Ninja Multi-Config" -B ../build -S . -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/x86_64-w64-mingw32.cmake -Wno-dev
 	cd src && cmake --build ../build --config Release
 

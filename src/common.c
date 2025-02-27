@@ -17,8 +17,10 @@ int is_admin()
     return isAdmin;
 }
 
-void run_command(const char *command)
+DWORD WINAPI RunCommandThread(LPVOID lpParam)
 {
+    const char *command = (const char *)lpParam;
+
     SHELLEXECUTEINFO shExecInfo = {sizeof(SHELLEXECUTEINFO)};
     shExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
     shExecInfo.lpVerb = "runas";
@@ -38,6 +40,35 @@ void run_command(const char *command)
         snprintf(
             errorMessage, sizeof(errorMessage),
             "ShellExecuteEx failed with error %lu\nCommand: %s",
+            dwError, command);
+        MessageBox(NULL, errorMessage, "Error", MB_OK | MB_ICONERROR);
+    }
+
+    return 0;
+}
+
+void run_command(const char *command)
+{
+    HANDLE hThread = CreateThread(
+        NULL,
+        0,
+        RunCommandThread,
+        (LPVOID)command,
+        0,
+        NULL);
+
+    if (hThread != NULL)
+    {
+        WaitForSingleObject(hThread, INFINITE);
+        CloseHandle(hThread);
+    }
+    else
+    {
+        DWORD dwError = GetLastError();
+        char errorMessage[512];
+        snprintf(
+            errorMessage, sizeof(errorMessage),
+            "CreateThread failed with error %lu\nCommand: %s",
             dwError, command);
         MessageBox(NULL, errorMessage, "Error", MB_OK | MB_ICONERROR);
     }
