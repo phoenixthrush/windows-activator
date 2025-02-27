@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <shlobj.h>
 #include <stdio.h>
 
 int is_admin()
@@ -15,6 +16,27 @@ int is_admin()
     }
 
     return isAdmin;
+}
+
+int request_admin()
+{
+    if (!IsUserAnAdmin())
+    {
+        WCHAR szPath[MAX_PATH];
+        GetModuleFileNameW(NULL, szPath, MAX_PATH);
+        SHELLEXECUTEINFOW ShExInfo = {0};
+        ShExInfo.cbSize = sizeof(SHELLEXECUTEINFOW);
+        ShExInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+        ShExInfo.hwnd = NULL;
+        ShExInfo.lpVerb = L"runas";
+        ShExInfo.lpFile = szPath;
+        ShExInfo.lpParameters = NULL;
+        ShExInfo.lpDirectory = NULL;
+        ShExInfo.nShow = SW_SHOWNORMAL;
+        ShellExecuteExW(&ShExInfo);
+        return 0;
+    }
+    return 1;
 }
 
 void run_command(const char *command)

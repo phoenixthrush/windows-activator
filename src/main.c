@@ -51,9 +51,15 @@ void activate_cb(const char *seq, const char *req, void *arg)
     }
     else
     {
-        MessageBoxA(NULL, "Not running as administrator", "Error", MB_OK | MB_ICONERROR);
-        webview_terminate(w);
-        exit(1);
+        MessageBoxA(NULL, "Not running as administrator, do you want to request?", "Error", MB_OK | MB_ICONERROR);
+        if (request_admin())
+        {
+            MessageBoxA(NULL, "Running with admin privileges.", "Success", MB_OK);
+        }
+        else
+        {
+            MessageBoxA(NULL, "App relaunching with admin privileges.", "Relaunching", MB_OK);
+        }
     }
 
     char *officeEdition = get_office_edition();
