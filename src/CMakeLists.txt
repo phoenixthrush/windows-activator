@@ -56,6 +56,11 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
                 -o ${GENERATED_FILE}
         DEPENDS ohook
     )
+
+    set(OHOOOK_BUILT TRUE)
+else()
+    set(GENERATED_FILE ${CMAKE_BINARY_DIR}/sppc64.dll.c)
+    set(OHOOOK_BUILT FALSE)
 endif()
 
 if (MINGW OR WIN32)
@@ -75,7 +80,9 @@ if (MINGW OR WIN32)
         resource.rc
     )
 
-    add_dependencies(activator ohook)
+    if (OHOOOK_BUILT)
+        add_dependencies(activator ohook)
+    endif()
 else()
     add_executable(activator
         main.c
