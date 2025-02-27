@@ -268,3 +268,15 @@ char *get_office_edition()
     MessageBoxA(NULL, "Failed to retrieve Office edition.", "Error", MB_OK | MB_ICONERROR);
     return NULL;
 }
+
+char *getLicenseKey(char *productName)
+{
+    for (int i = 0; i < sizeof(officeKeys) / sizeof(officeKeys[0]); i++)
+    {
+        if (strcmp(officeKeys[i].product, productName) == 0)
+        {
+            return officeKeys[i].generatedKey;
+        }
+    }
+    return NULL;
+}

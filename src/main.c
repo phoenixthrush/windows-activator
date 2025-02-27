@@ -35,6 +35,48 @@ int create_sppc()
 }
 #endif
 
+void ohook_cb(const char *seq, const char *req, void *arg)
+{
+#ifdef _WIN32
+    (void)seq;
+    (void)req;
+    webview_t w = (webview_t)arg;
+
+    MessageBoxA(NULL, "Create sppc.dll symlink\nmklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"", "Info", MB_OK | MB_ICONINFORMATION);
+    run_command("mklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"");
+
+    MessageBoxA(NULL, "Create %ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppc.dll", "Info", MB_OK | MB_ICONINFORMATION);
+    if (create_sppc() != 0)
+    {
+        MessageBoxA(NULL, "Failed to create sppc.dll.", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(w);
+        exit(1);
+    }
+
+    MessageBoxA(NULL, "Get Office Edition", "Info", MB_OK | MB_ICONINFORMATION);
+    char *officeEdition = get_office_edition();
+
+    MessageBoxA(NULL, "Get Generic Key", "Info", MB_OK | MB_ICONINFORMATION);
+    char *licenseKey = getLicenseKey(officeEdition);
+
+    if (licenseKey != NULL)
+    {
+        MessageBoxA(NULL, "Activate Office", "Info", MB_OK | MB_ICONINFORMATION);
+        char command[512];
+        snprintf(command, sizeof(command), "slmgr /ipk %s", licenseKey);
+        run_command(command);
+    }
+    else
+    {
+        MessageBoxA(NULL, "Failed to retrieve license key.", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(w);
+        exit(1);
+    }
+#else
+    printf("Unsupported OS\n");
+#endif
+}
+
 void activate_cb(const char *seq, const char *req, void *arg)
 {
     (void)seq;
@@ -52,20 +94,6 @@ void activate_cb(const char *seq, const char *req, void *arg)
     else
     {
         MessageBoxA(NULL, "Not running as administrator", "Error", MB_OK | MB_ICONERROR);
-        webview_terminate(w);
-        exit(1);
-    }
-
-    char *officeEdition = get_office_edition();
-    if (officeEdition)
-    {
-        char message[512];
-        snprintf(message, sizeof(message), "Installed Office Suite: %s", officeEdition);
-        MessageBoxA(NULL, message, "Info", MB_OK | MB_ICONINFORMATION);
-    }
-    else
-    {
-        MessageBoxA(NULL, "Failed to retrieve Office edition", "Error", MB_OK | MB_ICONERROR);
         webview_terminate(w);
         exit(1);
     }
@@ -232,6 +260,7 @@ int main(void)
     // webview_navigate(w, "file:///Users/phoenixthrush/opt/windows-activator/site/index.html");
 
     webview_bind(w, "activate", activate_cb, NULL);
+    webview_bind(w, "ohook", ohook_cb, NULL);
     webview_bind(w, "credits", credits_cb, NULL);
     webview_bind(w, "quit", quit_cb, w);
 
