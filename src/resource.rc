@@ -1,5 +1,5 @@
 IDI_ICON1 ICON "icon.ico"
-
+1 24 "activator.exe.manifest"
 1 VERSIONINFO
 FILEVERSION 1,0,0,0
 PRODUCTVERSION 1,0,0,0
