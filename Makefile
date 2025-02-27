@@ -29,7 +29,7 @@ ifeq ($(OS),Windows_NT)
 	INCLUDE_OHOOK_DLL = echo Skipping ohook inclusion
 
 	# broken
-	PACK_USING_UPX = if exist build\bin\activator.exe (if exist upx (upx --best build\bin\activator.exe) else echo UPX not installed) else echo activator.exe not found
+	PACK_USING_UPX = if exist build\bin\activator.exe (where upx >nul 2>nul && upx --best build\bin\activator.exe || echo UPX not installed) else echo activator.exe not found
 else
     MKDIR = mkdir -p build build/_deps/ohook/src/ohook/
     RMDIR = rm -rf build
