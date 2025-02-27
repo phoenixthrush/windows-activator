@@ -14,6 +14,7 @@ ifeq ($(OS),Windows_NT)
 	WINLIBS_URL_X86_64 := $(shell echo "$(WINLIBS_LATEST_RELEASE)" | findstr x86_64)
 	WINLIBS_URL_I686 := $(shell echo "$(WINLIBS_LATEST_RELEASE)" | findstr i686)
 
+	# broken?
 	DOWNLOAD_WINLIBS = if not exist "$(APPDATA_WINLIBS_DIR)" ( \
 		mkdir "$(APPDATA_WINLIBS_DIR)" && \
 		curl -L $(WINLIBS_URL_X86_64) -o "$(WINLIBS_X86_64)" && \
@@ -27,7 +28,8 @@ ifeq ($(OS),Windows_NT)
 	EXTRACT_OHOOK_DLL = echo Skipping ohook extraction
 	INCLUDE_OHOOK_DLL = echo Skipping ohook inclusion
 
-	PACK_USING_UPX = if exist build\bin\Release\activator.exe (if exist upx (upx --best build\bin\Release\activator.exe) else echo UPX not installed) else echo activator.exe not found
+	# broken
+	PACK_USING_UPX = if exist build\bin\activator.exe (if exist upx (upx --best build\bin\activator.exe) else echo UPX not installed) else echo activator.exe not found
 else
     MKDIR = mkdir -p build build/_deps/ohook/src/ohook/
     RMDIR = rm -rf build
@@ -44,7 +46,8 @@ else
 	EXTRACT_OHOOK_DLL = unzip build/ohook.zip -d build/_deps/ohook/src/ohook/
 	INCLUDE_OHOOK_DLL = python src/helpers/xxd.py -i build/_deps/ohook/src/ohook/sppc64.dll -o build/sppc64.dll.c
 
-	PACK_USING_UPX = if [ -f build/bin/activator.exe ]; then if [ -x "$(command -v upx)" ]; then upx --best build/bin/activator; else echo "UPX not installed"; fi; else echo "activator.exe not found, likely not a cross build"; fi
+	# brokem
+	PACK_USING_UPX = if [ -f build/bin/Release/activator.exe ]; then if [ -x "$(command -v upx)" ]; then upx --best build/bin/Release/activator; else echo "UPX not installed"; fi; else echo "activator.exe not found, likely not a cross build"; fi
 endif
 
 all: build

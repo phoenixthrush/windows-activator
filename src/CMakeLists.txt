@@ -46,6 +46,16 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
         BUILD_COMMAND cd ${CMAKE_BINARY_DIR}/_deps/ohook/src/ohook/ && powershell -EncodedCommand JABtAGkAbgBnAHcAMwAyAFAAYQB0AGgAIAA9ACAAIgAkAGUAbgB2ADoAQQBQAFAARABBAFQAQQAvAHcAaQBuAGwAaQBiAHMALwBtAGkAbgBnAHcAMwAyAC8AYgBpAG4ALwAiAAoAJABtAGkAbgBnAHcANgA0AFAAYQB0AGgAIAA9ACAAIgAkAGUAbgB2ADoAQQBQAFAARABBAFQAQQAvAHcAaQBuAGwAaQBiAHMALwBtAGkAbgBnAHcANgA0AC8AYgBpAG4ALwAiAAoACgAkAG0AaQBuAGcAdwAzADIAUABhAHQAaAAgAD0AIAAkAG0AaQBuAGcAdwAzADIAUABhAHQAaAAgAC0AcgBlAHAAbABhAGMAZQAgACcAXABcACcALAAgACcALwAnAAoAJABtAGkAbgBnAHcANgA0AFAAYQB0AGgAIAA9ACAAJABtAGkAbgBnAHcANgA0AFAAYQB0AGgAIAAtAHIAZQBwAGwAYQBjAGUAIAAnAFwAXAAnACwAIAAnAC8AJwAKAAoAKABHAGUAdAAtAEMAbwBuAHQAZQBuAHQAIABNAGEAawBlAGYAaQBsAGUAKQAgAC0AcgBlAHAAbABhAGMAZQAgACIAQwA6AC8AbQBpAG4AZwB3ADMAMgAvAGIAaQBuAC8AIgAsACAAJABtAGkAbgBnAHcAMwAyAFAAYQB0AGgAIAAtAHIAZQBwAGwAYQBjAGUAIAAiAEMAOgAvAG0AaQBuAGcAdwA2ADQALwBiAGkAbgAvACIALAAgACQAbQBpAG4AZwB3ADYANABQAGEAdABoACAAfAAgAFMAZQB0AC0AQwBvAG4AdABlAG4AdAAgAE0AYQBrAGUAZgBpAGwAZQAKACgARwBlAHQALQBDAG8AbgB0AGUAbgB0ACAATQBhAGsAZQBmAGkAbABlACkAIAB8ACAAVwBoAGUAcgBlAC0ATwBiAGoAZQBjAHQAIAB7ACQAXwAgAC0AbgBvAHQAbQBhAHQAYwBoACAAJwBeAFwAcwAqAHMAdAByAGkAcAAgAC0AcwAnAH0AIAB8ACAAUwBlAHQALQBDAG8AbgB0AGUAbgB0ACAATQBhAGsAZQBmAGkAbABlAAoA && make
         INSTALL_COMMAND ""
     )
+
+    set(GENERATED_FILE ${CMAKE_BINARY_DIR}/sppc64.dll.c)
+
+    add_custom_command(
+        OUTPUT ${GENERATED_FILE}
+        COMMAND python ${CMAKE_SOURCE_DIR}/../src/helpers/xxd.py 
+                -i ${CMAKE_BINARY_DIR}/_deps/ohook/src/ohook/sppc64.dll 
+                -o ${GENERATED_FILE}
+        DEPENDS ohook
+    )
 endif()
 
 if (MINGW OR WIN32)
@@ -54,12 +64,23 @@ if (MINGW OR WIN32)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -static")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -static")
-    
-    add_executable(activator WIN32)
-    target_sources(activator PRIVATE main.c ${CMAKE_BINARY_DIR}/index.modified.c common.c hwid.c ohook.c sppc64.dll.c resource.rc)
+
+    add_executable(activator WIN32
+        main.c
+        ${CMAKE_BINARY_DIR}/index.modified.c
+        common.c
+        hwid.c
+        ohook.c
+        ${GENERATED_FILE}
+        resource.rc
+    )
+
+    add_dependencies(activator ohook)
 else()
-    add_executable(activator)
-    target_sources(activator PRIVATE main.c ${CMAKE_BINARY_DIR}/index.modified.c)
+    add_executable(activator
+        main.c
+        ${CMAKE_BINARY_DIR}/index.modified.c
+    )
 endif()
 
 target_link_libraries(activator PRIVATE webview::core_static)
