@@ -182,8 +182,8 @@ void activate_cb(const char *seq, const char *req, void *arg)
         CreateDirectory(dir, NULL);
     }
 
-    MessageBoxA(NULL, "Download MS ADK file to C:\\Files\nThis will take some time, please wait :)", "Info", MB_OK | MB_ICONINFORMATION);
-    run_command("/c powershell -c Invoke-WebRequest -Uri 'https://download.microsoft.com/download/9/A/E/9AE69DD5-BA93-44E0-864E-180F5E700AB4/adk/Installers/14f4df8a2a7fc82a4f415cf6a341415d.cab' -OutFile 'C:\\Files\\14f4df8a2a7fc82a4f415cf6a341415d.cab'");
+    MessageBoxA(NULL, "Download MS ADK file to C:\\Files", "Info", MB_OK | MB_ICONINFORMATION);
+    run_command("/c curl.exe -o 'C:\\Files\\14f4df8a2a7fc82a4f415cf6a341415d.cab' 'https://download.microsoft.com/download/9/A/E/9AE69DD5-BA93-44E0-864E-180F5E700AB4/adk/Installers/14f4df8a2a7fc82a4f415cf6a341415d.cab'");
 
     MessageBoxA(NULL, "Expand ADK files to C:\\Files", "Info", MB_OK | MB_ICONINFORMATION);
     run_command("/c expand C:\\Files\\14f4df8a2a7fc82a4f415cf6a341415d.cab -F:* C:\\Files\\");

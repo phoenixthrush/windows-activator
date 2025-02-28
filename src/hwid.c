@@ -104,6 +104,19 @@ void set_compatibility_mode(const char *exe_path)
 
     if (lResult != ERROR_SUCCESS)
     {
+        lResult = RegCreateKeyExA(HKEY_CURRENT_USER,
+                                  "Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers",
+                                  0, NULL, REG_OPTION_NON_VOLATILE,
+                                  KEY_WRITE, NULL, &hKey, NULL);
+    }
+
+    if (lResult == ERROR_SUCCESS)
+    {
+        RegCloseKey(hKey);
+    }
+
+    if (lResult != ERROR_SUCCESS)
+    {
         MessageBoxA(NULL, "Failed to open registry key.", "Error", MB_OK | MB_ICONERROR);
         return;
     }
