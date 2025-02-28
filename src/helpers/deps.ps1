@@ -1,3 +1,6 @@
+Write-Host "Verifying that all dependencies are installed"
+
+# TODO: gather all dependencies here
 $packages = @(
     'ezwinports.make'
 )
