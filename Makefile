@@ -1,5 +1,7 @@
 ifeq ($(OS),Windows_NT)
 	SHELL = cmd
+	CHECK_DEPENDENCIES = powershell -ExecutionPolicy Bypass -File "src/helpers/deps.ps1"
+
 	MKDIR = if not exist build mkdir build
 	RMDIR = if exist build rmdir /s /q build
 
@@ -12,8 +14,11 @@ ifeq ($(OS),Windows_NT)
 	# will be replaced by a helper
 	# PACK_USING_UPX = if exist build\bin\activator.exe (where upx >nul 2>nul && upx --best build\bin\activator.exe || echo UPX not installed) else echo activator.exe not found
 else
+	CHECK_DEPENDENCIES = bash ./src/helpers/deps.sh
+
     MKDIR = mkdir -p build build/_deps/ohook/src/ohook/
     RMDIR = rm -rf build
+
 	AUDIO_CMD = [ -f site/assets/audio/keygen-Uh-p3TOIrOc.mp3 ] || yt-dlp -f bestaudio --extract-audio --audio-quality 64K --audio-format mp3 -o "site/assets/audio/keygen-Uh-p3TOIrOc.mp3" "https://www.youtube.com/watch?v=tPY-I3RX10c"
 
 	DOWNLOAD_OHOOK_DLL = curl -Lo build/ohook.zip https://github.com/asdcorp/ohook/releases/download/0.5/ohook_0.5.zip
@@ -27,7 +32,9 @@ endif
 all: build
 
 prepare:
+	$(CHECK_DEPENDENCIES)
 	$(MKDIR)
+
 	$(AUDIO_CMD)
 
 	$(DOWNLOAD_OHOOK_DLL)
