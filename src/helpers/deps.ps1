@@ -11,6 +11,9 @@ foreach ($package in $packages) {
     }
 }
 
+# This is probably not needed since a C compiler should already be installed above
+# The path should be patched dynamically in the CMakeLists.txt under the BUILD_COMMAND ohook section
+<#
 $releaseUrl = 'https://api.github.com/repos/brechtsanders/winlibs_mingw/releases/latest'
 $downloadLinks = curl.exe -s $releaseUrl | Select-String -Pattern 'browser_download_url' | ForEach-Object { $_.ToString() } | Where-Object { $_ -notmatch 'llvm|7z|sha256|sha512' }
 
@@ -26,3 +29,4 @@ foreach ($link in $downloadLinks) {
     $outFile = Join-Path $dir $filename
     Invoke-WebRequest -Uri $url -OutFile $outFile
 }
+#>
