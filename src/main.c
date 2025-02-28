@@ -18,14 +18,14 @@ extern unsigned int index_modified_html_len;
 extern unsigned char sppc64_dll[];
 extern unsigned int sppc64_dll_len;
 
-int create_sppc()
+int create_sppc(const char *path)
 {
-    char path[MAX_PATH];
-    snprintf(path, MAX_PATH, "%s\\Microsoft Office\\root\\vfs\\System\\sppcs.dll", getenv("ProgramFiles"));
-
-    HANDLE hFile = CreateFileA(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hFile = CreateFileA(path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (hFile == INVALID_HANDLE_VALUE)
         return 1;
+
+    SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
+    SetEndOfFile(hFile);
 
     DWORD written;
     WriteFile(hFile, sppc64_dll, sppc64_dll_len, &written, NULL);
@@ -43,27 +43,42 @@ void ohook_cb(const char *seq, const char *req, void *arg)
     webview_t w = (webview_t)arg;
 
     MessageBoxA(NULL, "Create sppc.dll symlink\nmklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"", "Info", MB_OK | MB_ICONINFORMATION);
-    run_command("mklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"");
+    run_command("/c mklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"");
 
-    MessageBoxA(NULL, "Create %ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppc.dll", "Info", MB_OK | MB_ICONINFORMATION);
-    if (create_sppc() != 0)
+    MessageBoxA(NULL, "Create patched %ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppc.patched.dll by ohook", "Info", MB_OK | MB_ICONINFORMATION);
+
+    char path[MAX_PATH];
+    snprintf(path, MAX_PATH, "%s\\Microsoft Office\\root\\vfs\\System\\sppcs.patched.dll", getenv("ProgramFiles"));
+    if (create_sppc(path) != 0)
     {
         MessageBoxA(NULL, "Failed to create sppc.dll.", "Error", MB_OK | MB_ICONERROR);
         webview_terminate(w);
         exit(1);
     }
 
+    MessageBoxA(NULL, "Overwrite sppcs.dll with sppcs.patched.dll", "Info", MB_OK | MB_ICONINFORMATION);
+    char command[MAX_PATH];
+    snprintf(command, MAX_PATH, "/c copy /y %s\\sppc64.patched.dll %s\\sppc64.dll", path, path);
+    run_command(command);
+
     MessageBoxA(NULL, "Get Office Edition", "Info", MB_OK | MB_ICONINFORMATION);
+
     char *officeEdition = get_office_edition();
+    char msg[256];
+    snprintf(msg, sizeof(msg), "Office Edition: %s", officeEdition);
+    MessageBoxA(NULL, msg, "Info", MB_OK | MB_ICONINFORMATION);
 
     MessageBoxA(NULL, "Get Generic Key", "Info", MB_OK | MB_ICONINFORMATION);
+
     char *licenseKey = getLicenseKey(officeEdition);
+    snprintf(msg, sizeof(msg), "Matching Generic Key: %s", licenseKey);
+    MessageBoxA(NULL, msg, "Info", MB_OK | MB_ICONINFORMATION);
 
     if (licenseKey != NULL)
     {
         MessageBoxA(NULL, "Activate Office", "Info", MB_OK | MB_ICONINFORMATION);
         char command[512];
-        snprintf(command, sizeof(command), "slmgr /ipk %s", licenseKey);
+        snprintf(command, sizeof(command), "/c slmgr /ipk %s", licenseKey);
         run_command(command);
     }
     else
