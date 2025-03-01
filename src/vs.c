@@ -13,7 +13,7 @@ struct vsKeys vs_keys[] = {
     {"Visual Studio 2019 Professional", "NYWVH-HT4XC-R2WYW-9Y3CM-X4V3Y"},
     {"Visual Studio 2019 Enterprise", "BF8Y8-GN2QH-T84XB-QVY3B-RC4DF"}};
 
-int get_edition_index(const char *edition)
+int get_edition_index_vs(const char *edition)
 {
     for (int i = 0; i < sizeof(vs_keys) / sizeof(vs_keys[0]); ++i)
     {
@@ -30,7 +30,7 @@ int activate_vs()
     // TODO: add edition selection
     const char *edition = "Visual Studio 2022 Professional";
 
-    int edition_index = get_edition_index(edition);
+    int edition_index = get_edition_index_vs(edition);
     if (edition_index == -1)
     {
         MessageBoxA(NULL, "Edition not found!", "Error", MB_OK | MB_ICONERROR);

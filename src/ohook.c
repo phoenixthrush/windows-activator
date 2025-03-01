@@ -223,23 +223,7 @@ struct Software software[] = {
     {"SQL Server 2019 Enterprise", "HMWJ3-KY3J2-NMVD7-KG4JR-X2G8G"},
     {"SQL Server 2019 Standard", "PMBDC-FXVM3-T777P-N4FY8-PKFF4"},
     {"32-bit (x86) Windows XP Pro VL SP3 ISO Activation key", "XCYBK-2B3KV-G8T8F-WXJM7-WCTYT"},
-    {"64-bit (x64) Windows XP Pro VL SP2 ISO Activation key", "VCFQD-V9FX9-46WVH-K3CD4-4J3JM"},
-    {"VMware Workstation Pro 17", "MC60H-DWHD5-H80U9-6V85M-8280D"},
-    {"VMware Workstation Pro 17", "4A4RR-813DK-M81A9-4U35H-06KND"},
-    {"VMware Workstation Pro 17", "NZ4RR-FTK5H-H81C1-Q30QH-1V2LA"},
-    {"VMware Workstation Pro 17", "JU090-6039P-08409-8J0QH-2YR7F"},
-    {"VMware Workstation Pro 17", "4Y09U-AJK97-089Z0-A3054-83KLA"},
-    {"VMware Workstation Pro 17", "4C21U-2KK9Q-M8130-4V2QH-CF810"},
-    {"VMware Workstation Pro 17", "HY45K-8KK96-MJ8E0-0UCQ4-0UH72"},
-    {"VMware Workstation Pro 17", "JC0D8-F93E4-HJ9Q9-088N6-96A7F"},
-    {"VMware Workstation Pro 17", "NG0RK-2DK9L-HJDF8-1LAXP-1ARQ0"},
-    {"VMware Workstation Pro 17", "0U2J0-2E19P-HJEX1-132Q2-8AKK6"},
-    {"VMware Fusion 13", "4A4RR-813DK-M81A9-4U35H-06KND"},
-    {"VMware Fusion 13", "NZ4RR-FTK5H-H81C1-Q30QH-1V2LA"},
-    {"VMware Fusion 13", "4C21U-2KK9Q-M8130-4V2QH-CF810"},
-    {"VMware Fusion 13", "MC60H-DWHD5-H80U9-6V85M-8280D"},
-    {"VMware Fusion 13", "JU090-6039P-08409-8J0QH-2YR7F"},
-    {"VMware Fusion 13", "4Y09U-AJK97-089Z0-A3054-83KLA"}};
+    {"64-bit (x64) Windows XP Pro VL SP2 ISO Activation key", "VCFQD-V9FX9-46WVH-K3CD4-4J3JM"}};
 
 char *get_office_edition()
 {
