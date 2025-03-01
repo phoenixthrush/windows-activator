@@ -77,6 +77,7 @@ if (MINGW OR WIN32)
         hwid.c
         ohook.c
         vs.c
+        vmware.c
         ${GENERATED_FILE}
         resource.rc
     )

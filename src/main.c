@@ -10,6 +10,7 @@
 #include "hwid.h"
 #include "ohook.h"
 #include "vs.h"
+#include "vmware.h"
 #endif
 
 extern unsigned char index_modified_html[];
@@ -101,6 +102,19 @@ void vs_cb(const char *seq, const char *req, void *arg)
     webview_t w = (webview_t)arg;
 
     activate_vs();
+#else
+    printf("Unsupported OS\n");
+#endif
+}
+
+void vmware_cb(const char *seq, const char *req, void *arg)
+{
+#ifdef _WIN32
+    (void)seq;
+    (void)req;
+    webview_t w = (webview_t)arg;
+
+    activate_vmware();
 #else
     printf("Unsupported OS\n");
 #endif
@@ -291,6 +305,7 @@ int main(void)
     webview_bind(w, "activate", activate_cb, NULL);
     webview_bind(w, "ohook", ohook_cb, NULL);
     webview_bind(w, "vs", vs_cb, NULL);
+    webview_bind(w, "vmware", vmware_cb, NULL);
     webview_bind(w, "credits", credits_cb, NULL);
     webview_bind(w, "quit", quit_cb, w);
 
