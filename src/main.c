@@ -35,6 +35,31 @@ int create_sppc(const char *path)
 
     return (written == sppc64_dll_len) ? 0 : 1;
 }
+
+int create_unattended_office_xml()
+{
+    const char *config_xml =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        "<Configuration>\n"
+        "    <Add OfficeClientEdition=\"64\">\n"
+        "        <Product ID=\"O365ProPlusRetail\">\n"
+        "            <Language ID=\"en-us\"/>\n"
+        "        </Product>\n"
+        "    </Add>\n"
+        "    <Display Level=\"None\" AcceptEULA=\"TRUE\"/>\n"
+        "    <Property Name=\"AUTOACTIVATE\" Value=\"0\"/>\n"
+        "</Configuration>\n";
+
+    FILE *file = fopen("C:/Windows/Temp/config.xml", "w");
+    if (file == NULL)
+    {
+        return -1;
+    }
+
+    fputs(config_xml, file);
+    fclose(file);
+    return 0;
+}
 #endif
 
 void ohook_cb(const char *seq, const char *req, void *arg)
@@ -43,6 +68,19 @@ void ohook_cb(const char *seq, const char *req, void *arg)
     (void)seq;
     (void)req;
     webview_t w = (webview_t)arg;
+
+    if (MessageBoxA(NULL, "Do you want to download Office 365?", "Info", MB_YESNO | MB_ICONQUESTION) == IDYES)
+    {
+        download_file("https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=O365ProPlusRetail&platform=x64&language=en-us&version=O16GA", "C:/Windows/Temp/OfficeSetup.exe");
+
+        /*
+        MessageBoxA(NULL, "Create unattended Office configuration XML", "Info", MB_OK | MB_ICONINFORMATION);
+        create_unattended_office_xml();
+        */
+
+        MessageBoxA(NULL, "Start Office installation", "Info", MB_OK | MB_ICONINFORMATION);
+        run_command("/c start /wait C:/Windows/Temp/OfficeSetup.exe");
+    }
 
     MessageBoxA(NULL, "Create sppc.dll symlink\nmklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"", "Info", MB_OK | MB_ICONINFORMATION);
     run_command("/c mklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"");
