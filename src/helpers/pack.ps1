@@ -7,6 +7,11 @@ if (Test-Path $activatorPath) {
     } else {
         Write-Host "UPX is not installed."
     }
+
+    $commit_hash = git rev-parse --short HEAD
+    $newFileName = "build/bin/activator.$commit_hash.exe"
+    Rename-Item $activatorPath $newFileName
+    Write-Host "File renamed to $newFileName"
 } else {
     Write-Host "$activatorPath not found."
 }
