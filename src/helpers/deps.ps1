@@ -5,13 +5,14 @@ $packages = @(
     'Python.Python.3.13',
     'Kitware.CMake',
     'Ninja-build.Ninja',
-    'MartinStorsjo.LLVM-MinGW.URCT',
+    'MartinStorsjo.LLVM-MinGW.UCRT',
     'UPX.UPX'
 )
 
 $installedCount = 0
 
 foreach ($package in $packages) {
+    Write-Host $package
     $packageInstalled = (winget list | Select-String -Pattern $package)
 
     if (-not $packageInstalled) {
