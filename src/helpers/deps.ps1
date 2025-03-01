@@ -1,6 +1,5 @@
 Write-Host "Verifying that all dependencies are installed"
 
-# TODO: add missing deps
 $packages = @(
     'ezwinports.make',
     'Python.Python.3.13',
@@ -10,13 +9,21 @@ $packages = @(
     'UPX.UPX'
 )
 
+$installedCount = 0
+
 foreach ($package in $packages) {
     $packageInstalled = (winget list | Select-String -Pattern $package)
 
     if (-not $packageInstalled) {
         $wingetCommand = "winget install $package"
         Invoke-Expression $wingetCommand
+        $installedCount++
     }
+}
+
+if ($installedCount -gt 1) {
+    Write-Host "Please restart the shell and run 'make' again to use the installed packages."
+    exit
 }
 
 # This is probably not needed since a C compiler should already be installed above
