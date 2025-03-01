@@ -1,12 +1,18 @@
 <a id="readme-top"></a>
 
-# Windows HWID Activator
+# Windows & Office Activation
 
-A simple tool for permanently activating Windows 10/11 using your system's hardware ID (HWID).
+A simple tool for permanently activating **Windows 10/11** and **Microsoft Office** on Windows 8 and later.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Features
+## Windows Activation
+
+Permanently activates Windows 10/11 using your system's hardware ID.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Features
 
 -   Does not modify or store any files on your system
 -   Provides permanent activation tied to your hardware
@@ -17,7 +23,7 @@ A simple tool for permanently activating Windows 10/11 using your system's hardw
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Supported Editions
+### Supported Editions
 
 | Edition Type       | Variants                                                                                                                                   |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -32,15 +38,24 @@ A simple tool for permanently activating Windows 10/11 using your system's hardw
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Dependencies
+### How does it work?
 
--   winget install ffmpeg
+The activator installs a generic Retail, OEM, or MAK key, then patches gatherosstate.exe (downloaded from the MS ADK) via GamersOsState to generate a genuine ticket to create a valid digital license.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## How does it work?
+## Office Activation
 
-The activator installs a generic Retail, OEM, or MAK key, then patches gatherosstate.exe (downloaded from the MS ADK) via GamersOsState to generate a genuine ticket to create a valid digital license.
+Activates most Office versions on Windows 8 and later, including Server editions, except Office 2010 and UWP apps.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Features
+
+-   Works offline and stays activated permanently
+-   Survives Office repairs, updates, and Windows upgrades without reactivation
+-   Server side Office 365 features like 1TB OneDrive storage are not available, but all other features and 5GB of free storage remain
+-   Does not modify system files, just installs a custom open source SPPC.dll for activation
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
