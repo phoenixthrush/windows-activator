@@ -1,5 +1,8 @@
-#include <windows.h>
 #include <stdio.h>
+#include <windows.h>
+#include <urlmon.h>
+
+#pragma comment(lib, "urlmon.lib")
 
 int is_admin()
 {
@@ -72,4 +75,17 @@ void run_command(const char *command)
             dwError, command);
         MessageBox(NULL, errorMessage, "Error", MB_OK | MB_ICONERROR);
     }
+}
+
+int download_file(const char *url, const char *destination)
+{
+    HRESULT hr = URLDownloadToFileA(NULL, url, destination, 0, NULL);
+    if (FAILED(hr))
+    {
+        MessageBoxA(NULL, "Download failed", "Error", MB_OK | MB_ICONERROR);
+        return 1;
+    }
+
+    MessageBoxA(NULL, "Download successful", "Info", MB_OK | MB_ICONINFORMATION);
+    return 0;
 }

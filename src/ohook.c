@@ -215,10 +215,6 @@ OfficeKey officeKeys[] = {
     {"v16.0 (2024)", "Word2024Volume", "WD8CQ-6KNQM-8W2CX-2RT63-KK3TP", "MAK-AE"}};
 
 struct Software software[] = {
-    {"Visual Studio 2022 Professional", "TD244-P4NB7-YQ6XK-Y8MMM-YWV2J"},
-    {"Visual Studio 2022 Enterprise", "VHF9H-NXBBB-638P6-6JHCY-88JWH"},
-    {"Visual Studio 2019 Professional", "NYWVH-HT4XC-R2WYW-9Y3CM-X4V3Y"},
-    {"Visual Studio 2019 Enterprise", "BF8Y8-GN2QH-T84XB-QVY3B-RC4DF"},
     {"SQL Server 2022 Enterprise", "J4V48-P8MM4-9N3J9-HD97X-DYMRM"},
     {"SQL Server 2022 Enterprise Core", "2Q48Q-PB48J-DRCVN-GB844-X2H4Q"},
     {"SQL Server 2022 Standard", "FG86G-CHH2T-CB7NJ-XT7D2-V8V4X"},
