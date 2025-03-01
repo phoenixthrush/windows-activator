@@ -76,6 +76,7 @@ if (MINGW OR WIN32)
         common.c
         hwid.c
         ohook.c
+        vs.c
         ${GENERATED_FILE}
         resource.rc
     )
@@ -83,11 +84,12 @@ if (MINGW OR WIN32)
     if (OHOOOK_BUILT)
         add_dependencies(activator ohook)
     endif()
+
+    target_link_libraries(activator PRIVATE webview::core_static urlmon)
 else()
     add_executable(activator
         main.c
         ${CMAKE_BINARY_DIR}/index.modified.c
     )
+    target_link_libraries(activator PRIVATE webview::core_static)
 endif()
-
-target_link_libraries(activator PRIVATE webview::core_static)
