@@ -97,4 +97,6 @@ int extract_tar(const char *tar_file, const char *target_dir)
     char command[512];
     snprintf(command, sizeof(command), "/c tar -xf %s -C %s", tar_file, target_dir);
     run_command(command);
+
+    return 0;
 }
