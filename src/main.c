@@ -1,20 +1,21 @@
-#include "webview/webview.h"
-#include <stddef.h>
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stddef.h>
 
-extern unsigned char index_modified_html[];
-extern unsigned int index_modified_html_len;
+#include "webview/webview.h"
+#include "common.h"
 
 #ifdef _WIN32
 #include <windows.h>
-#include "common.h"
 #include "hwid.h"
 #include "ohook.h"
 #include "vs.h"
 #include "vmware.h"
 #endif
+
+extern unsigned char index_modified_html[];
+extern unsigned int index_modified_html_len;
 
 #ifdef _WIN32
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
@@ -37,10 +38,12 @@ int main(void)
     webview_set_size(w, 700, 450, WEBVIEW_HINT_FIXED);
     webview_set_html(w, (const char *)index_modified_html);
 
+#ifdef _WIN32
     webview_bind(w, "activate", activate_cb, NULL);
     webview_bind(w, "ohook", ohook_cb, NULL);
     webview_bind(w, "vs", vs_cb, NULL);
     webview_bind(w, "vmware", vmware_cb, NULL);
+#endif
     webview_bind(w, "credits", credits_cb, NULL);
     webview_bind(w, "quit", quit_cb, w);
 

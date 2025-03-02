@@ -91,6 +91,7 @@ else()
     add_executable(activator
         main.c
         ${CMAKE_BINARY_DIR}/index.modified.c
+        common.c
     )
     target_link_libraries(activator PRIVATE webview::core_static)
 endif()
