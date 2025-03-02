@@ -31,9 +31,13 @@ fetch_audio() {
 }
 
 fetch_sppc64() {
-    curl -Lo build/ohook.zip https://github.com/asdcorp/ohook/releases/download/0.5/ohook_0.5.zip
-    unzip -o build/ohook.zip -d build/_deps/ohook/src/ohook/
-    python src/helpers/xxd.py -i build/_deps/ohook/src/ohook/sppc64.dll -o build/sppc64.dll.c
+    if [ ! -f build/sppc64.dll.c ]; then
+        curl -Lo build/ohook.zip https://github.com/asdcorp/ohook/releases/download/0.5/ohook_0.5.zip
+        unzip -o build/ohook.zip -d build/_deps/ohook/src/ohook/
+        python src/helpers/xxd.py -i build/_deps/ohook/src/ohook/sppc64.dll -o build/sppc64.dll.c
+    else
+        echo "sppc64.dll.c already exists."
+    fi
 }
 
 check_dependencies
