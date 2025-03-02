@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <urlmon.h>
+#include "webview/webview.h"
 
 #pragma comment(lib, "urlmon.lib")
 
@@ -99,4 +100,30 @@ int extract_tar(const char *tar_file, const char *target_dir)
     run_command(command);
 
     return 0;
+}
+
+void credits_cb(const char *seq, const char *req, void *arg)
+{
+    (void)seq;
+    (void)req;
+    (void)arg;
+
+#ifdef _WIN32
+    run_command("/c start https://www.phoenixthrush.com");
+#elif __APPLE__
+    system("open https://www.phoenixthrush.com");
+#elif __linux__
+    system("xdg-open https://www.phoenixthrush.com");
+#else
+    printf("Unsupported OS\n");
+#endif
+}
+
+void quit_cb(const char *seq, const char *req, void *arg)
+{
+    (void)seq;
+    (void)req;
+
+    webview_t w = (webview_t)arg;
+    webview_terminate(w);
 }

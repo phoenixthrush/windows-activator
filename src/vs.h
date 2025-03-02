@@ -3,7 +3,9 @@
 
 #include <windows.h>
 #include "common.h"
+#include "webview/webview.h"
+#include "common.h"
 
-int activate_vs();
+void vs_cb(const char *seq, const char *req, void *arg);
 
 #endif // VS_H
