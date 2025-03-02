@@ -1,9 +1,11 @@
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
-#include <urlmon.h>
 #include "webview/webview.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#include <urlmon.h>
 #pragma comment(lib, "urlmon.lib")
 
 int is_admin()
@@ -101,6 +103,7 @@ int extract_tar(const char *tar_file, const char *target_dir)
 
     return 0;
 }
+#endif
 
 void credits_cb(const char *seq, const char *req, void *arg)
 {
