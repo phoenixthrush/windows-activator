@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Universal Activation Toolkit</title>
     <style>
         body {
             margin: auto;
             height: 100svh;
             overflow: hidden;
-            text-align: center;
-            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
+            color: white;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            background-color: black;
         }
 
         h1,
@@ -30,14 +30,13 @@
 
         .container {
             position: relative;
-            height: 450px;
-            width: 375px;
-            /* border: 3px solid red; */
+            height: 425px;
+            width: 700px;
             display: flex;
-            flex-direction: column;
             justify-content: space-between;
-            color: #222;
             overflow: hidden;
+            background-color: black;
+            z-index: 1;
         }
 
         .container img {
@@ -47,19 +46,24 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            z-index: -1;
+            z-index: 0;
+            /* transform: scaleX(-1) translateY(50px); */
+            transform: translateY(50px);
         }
 
         .container h1 {
-            margin-top: 10%;
-            /* border: 3px solid orange; */
+            margin-left: 0.75em;
+            font-size: 1.75em;
+            z-index: inherit;
         }
 
         .container button {
             padding: 0.75em;
             font-size: 1.25em;
-            width: 50%;
+            height: 15%;
             margin: 3px;
+            text-align: left;
+            cursor: pointer;
             /*
             border-radius: 15px;
             box-shadow: 15px;
@@ -67,10 +71,28 @@
         }
 
         .box {
-            /* border: 2px solid blue; */
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             padding: 10px;
+            width: 40%;
+            margin: 1.15em;
+            z-index: 3;
+            position: relative;
+        }
+
+        .btn:active {
+            transform: translateY(5%);
+        }
+
+        #copyright {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            padding: 3%;
+            font-size: 0.75em;
+            color: inherit;
+            text-decoration: none;
+            z-index: 3;
         }
 
         * {
@@ -80,68 +102,43 @@
             user-select: none;
         }
 
-        .btn {
-            position: relative;
-            font-size: 17px;
-            text-transform: uppercase;
-            text-decoration: none;
-            padding: 1em 2.5em;
-            display: inline-block;
-            cursor: pointer;
-            border-radius: 15px;
-            transition: all 0.2s;
-            border: none;
-            font-family: inherit;
-            font-weight: 500;
-            background-color: #eee;
-            /* border: 2px solid green; */
-        }
+        @media (min-width: 700px) and (min-height: 425px) {
+            body {
+                background-color: #7287fd;
+            }
 
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
+            /* Debug Borders */
+            .container {
+                border: 1px solid red;
+            }
 
-        .btn:active {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-        }
+            .container h1 {
+                border: 1px solid orange;
+            }
 
-        .btn::after {
-            content: "";
-            display: inline-block;
-            height: 100%;
-            width: 100%;
-            border-radius: 25px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            transition: all 0.4s;
-        }
+            .box {
+                border: 1px solid blue;
+            }
 
-        .btn::after {
-            background-color: #eee;
-        }
-
-        .btn:hover::after {
-            transform: scaleX(1.4) scaleY(1.6);
-            opacity: 0;
+            #copyright {
+                border: 1px solid green;
+            }
         }
     </style>
 </head>
 
 <body oncontextmenu="return false;">
     <div class="container">
-        <img src="assets/images/touhou.png" alt="touhou">
-        <h1>Activation Tool</h1>
+        <img src="assets/images/chaya.png" alt="touhou">
+        <h1>Universal Activation Toolkit</h1>
         <div class="box">
             <button type="button" class="btn" onclick="window.activate()">Windows 10/11</button>
-            <button type="button" class="btn" onclick="window.ohook()">MS Office</button>
+            <button type="button" class="btn" onclick="window.ohook()">Microsoft Office</button>
             <button type="button" class="btn" onclick="window.vs()">Visual Studio</button>
-            <button type="button" class="btn" onclick="window.vmware()">Vmware Workstation Pro</button>
-            <!-- <button type="button" class="btn" onclick="window.credits()">Credits</button> -->
-            <!-- <button type="button" class="btn" onclick="window.quit()">Quit</button> -->
+            <button type="button" class="btn" onclick="window.vmware()">Vmware Workstation</button>
+            <!-- <button type="button" class="btn" onclick="window.credits()">Developed By</button> -->
+            <button type="button" class="btn" onclick="window.quit()">Quit</button>
+            <a href="#" id="copyright" onclick="window.credits()">Made By Lulu</a>
         </div>
     </div>
     <!-- Fallback audio if offline or unreachable -->
@@ -149,7 +146,7 @@
     <script>
         async function checkNetwork() {
             return new Promise((resolve) => {
-                const audioTest = new Audio("https://files.tmaster055.com/moan.mp3");
+                const audioTest = new Audio("https://.mp3");
 
                 audioTest.oncanplaythrough = () => resolve(true);
                 audioTest.onerror = () => resolve(false);
@@ -161,8 +158,10 @@
             const online = await checkNetwork();
 
             if (online) {
-                audio.src = "https://files.tmaster055.com/moan.mp3";
+                audio.src = "https://.mp3";
             }
+
+            audio.volume = 0.1;
 
             // Not needed because of autoplay
             //  try {

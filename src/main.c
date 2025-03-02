@@ -331,8 +331,8 @@ int main(void)
 {
 #endif
     webview_t w = webview_create(0, NULL);
-    webview_set_title(w, "Windows Activation Tool");
-    webview_set_size(w, 375, 450, WEBVIEW_HINT_FIXED);
+    webview_set_title(w, "Universal Activation Toolkit");
+    webview_set_size(w, 700, 450, WEBVIEW_HINT_FIXED);
     webview_set_html(w, (const char *)index_modified_html);
 
     // maybe bypass 1572864 bytes limit in future
