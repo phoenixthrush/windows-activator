@@ -1,5 +1,7 @@
 #include <windows.h>
 #include "common.h"
+#include "webview/webview.h"
+#include "common.h"
 
 struct vmwareKeys
 {
@@ -37,15 +39,20 @@ int get_edition_index_vmware(const char *edition)
     return -1;
 }
 
-int activate_vmware()
+void vmware_cb(const char *seq, const char *req, void *arg)
 {
+    (void)seq;
+    (void)req;
+    webview_t w = (webview_t)arg;
+
     const char *edition = "VMware Workstation Pro 17";
 
     int edition_index = get_edition_index_vmware(edition);
     if (edition_index == -1)
     {
         MessageBoxA(NULL, "Edition not found!", "Error", MB_OK | MB_ICONERROR);
-        return 1;
+        webview_terminate(w);
+        exit(1);
     }
 
     // TODO: dynamically fetch latest link
@@ -62,6 +69,4 @@ int activate_vmware()
     char command[512];
     sprintf(command, "/c C:/Windows/Temp/VMware-workstation-17.6.2-24409262.exe --add-product --product-key %s --passive", vmware_keys[edition_index].key);
     run_command(command);
-
-    return 0;
 }

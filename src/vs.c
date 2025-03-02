@@ -1,5 +1,7 @@
 #include <windows.h>
 #include "common.h"
+#include "webview/webview.h"
+#include "common.h"
 
 struct vsKeys
 {
@@ -25,8 +27,12 @@ int get_edition_index_vs(const char *edition)
     return -1;
 }
 
-int activate_vs()
+void vs_cb(const char *seq, const char *req, void *arg)
 {
+    (void)seq;
+    (void)req;
+    webview_t w = (webview_t)arg;
+
     // TODO: add edition selection
     const char *edition = "Visual Studio 2022 Professional";
 
@@ -34,7 +40,8 @@ int activate_vs()
     if (edition_index == -1)
     {
         MessageBoxA(NULL, "Edition not found!", "Error", MB_OK | MB_ICONERROR);
-        return 1;
+        webview_terminate(w);
+        exit(1);
     }
 
     MessageBoxA(NULL, "Download Visual Studio", "Info", MB_OK | MB_ICONINFORMATION);
@@ -44,6 +51,4 @@ int activate_vs()
     char command[512];
     sprintf(command, "/c C:/Windows/Temp/vs_installer.exe --add-product --product-key %s --passive", vs_keys[edition_index].key);
     run_command(command);
-
-    return 0;
 }
