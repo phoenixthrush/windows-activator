@@ -48,7 +48,7 @@
             object-fit: cover;
             z-index: 0;
             /* transform: scaleX(-1) translateY(50px); */
-            transform: translateY(50px);
+            /* transform: translateY(50px); */
         }
 
         .container h1 {
@@ -95,6 +95,19 @@
             z-index: 3;
         }
 
+        #copyright-img {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            padding: 3%;
+            font-size: 0.75em;
+            color: inherit;
+            text-decoration: none;
+            z-index: 3;
+            padding: 0.75em;
+            margin: 3%;
+        }
+
         * {
             /* Disable Text Selection */
             -webkit-user-select: none;
@@ -124,13 +137,17 @@
             #copyright {
                 border: 1px solid green;
             }
+
+            #copyright-img {
+                border: 1px solid green;
+            }
         }
     </style>
 </head>
 
 <body oncontextmenu="return false;">
     <div class="container">
-        <img src="assets/images/chaya.png" alt="touhou">
+        <img src="assets/images/chaya.png" alt="touhou" id="background">
         <h1>Universal Activation Toolkit</h1>
         <div class="box">
             <button type="button" class="btn" onclick="window.activate()">Windows 10/11</button>
@@ -141,6 +158,7 @@
             <button type="button" class="btn" onclick="window.quit()">Quit</button>
             <a href="#" id="copyright" onclick="window.credits()">Made By Lulu</a>
         </div>
+        <a href="#" id="copyright-img"></a>
     </div>
     <!-- Fallback audio if offline or unreachable -->
     <audio id="audio-player" src="assets/audio/keygen-Uh-p3TOIrOc.mp3" loop autoplay></audio>
@@ -173,6 +191,30 @@
         }
 
         setAudioSource();
+    </script>
+    <script>
+        const themes = {
+            "touhou.png": "https://c4.wallpaperflare.com/wallpaper/760/803/807/anime-anime-girls-hakurei-reimu-touhou-wallpaper-preview.jpg",
+            "chaya.png": "https://get.wallhere.com/photo/selective-coloring-anime-girls-simple-background-black-background-2204297.jpg",
+            "tree.png": "https://wallpaperbat.com/img/8600050-japanese-cherry-blossom-landscape-ai.jpg"
+        };
+
+        function randomizeBackground() {
+            const keys = Object.keys(themes);
+            const randomKey = keys[Math.floor(Math.random() * keys.length)];
+            const urlKey = themes[randomKey];
+
+            const backgroundImg = document.getElementById('background');
+            const copyrightLink = document.getElementById('copyright-img');
+
+            backgroundImg.src = `assets/images/${randomKey}`;
+            backgroundImg.alt = randomKey;
+
+            copyrightLink.href = urlKey;
+            copyrightLink.textContent = "Source: " + randomKey;
+        }
+
+        window.onload = randomizeBackground;
     </script>
 </body>
 
