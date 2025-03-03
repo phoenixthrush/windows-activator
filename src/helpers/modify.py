@@ -3,61 +3,85 @@ import base64
 import os
 import argparse
 
-# pip install minify-html
 # https://docs.rs/minify-html/latest/minify_html/struct.Cfg.html
 import minify_html
 
 
-def encode_file_to_base64(filepath):
-    if not os.path.isfile(filepath):
+def convert_file_to_base64(file_path):
+    if not os.path.isfile(file_path):
         return None
-    with open(filepath, "rb") as f:
-        return base64.b64encode(f.read()).decode("utf-8")
+    with open(file_path, "rb") as binary_file:
+        return base64.b64encode(binary_file.read()).decode("utf-8")
 
 
-def replace_file_with_base64(match):
-    filepath = os.path.join("site", match.group(1))
-    file_ext = os.path.splitext(filepath)[1][1:]
-    base64_data = encode_file_to_base64(filepath)
-    if base64_data:
+def replace_src_with_base64(regex_match):
+    file_path = os.path.join("site", regex_match.group(1))
+    file_extension = os.path.splitext(file_path)[1][1:]
+    base64_string = convert_file_to_base64(file_path)
+    if base64_string:
         mime_type = (
-            f"image/{file_ext}" if file_ext in ["png", "jpg", "jpeg", "gif", "webp"]
-            else "audio/mpeg" if file_ext == "mp3"
+            f"image/{file_extension}" if file_extension in ["png", "jpg", "jpeg", "gif", "webp"]
+            else "audio/mpeg" if file_extension == "mp3"
             else "application/octet-stream"
         )
-        return f'src="data:{mime_type};base64,{base64_data}"'
-    print(f"Warning: File '{filepath}' not found. Skipping base64 encoding.")
-    return match.group(0)
+        return f'src="data:{mime_type};base64,{base64_string}"'
+    print(f"Warning: File '{file_path}' not found. Skipping base64 encoding.")
+    return regex_match.group(0)
 
 
-def replace_stylesheets_with_base64(match):
-    filepath = os.path.join("site", match.group(1))
-    if os.path.isfile(filepath):
-        with open(filepath, "r", encoding="utf-8") as f:
-            css_content = f.read()
-        return f'<style>{css_content}</style>'
-    print(f"Warning: CSS file '{filepath}' not found. Skipping embedding.")
-    return match.group(0)
+def embed_css_inline(regex_match):
+    css_file_path = os.path.join("site", regex_match.group(1))
+    if os.path.isfile(css_file_path):
+        with open(css_file_path, "r", encoding="utf-8") as css_file:
+            css_text = css_file.read()
+        return f'<style>{css_text}</style>'
+    print(
+        f"Warning: CSS file '{css_file_path}' not found. Skipping embedding.")
+    return regex_match.group(0)
 
 
-def modify_content(content):
-    content = re.sub(r'src="([^"]+)"', replace_file_with_base64, content)
-    content = re.sub(r'<link rel="stylesheet" href="([^"]+)">', replace_stylesheets_with_base64, content)
-    return minify_html.minify(content, minify_css=True, minify_js=True)
+def embed_js_inline(regex_match):
+    js_file_path = os.path.join("site", regex_match.group(1))
+    if os.path.isfile(js_file_path):
+        with open(js_file_path, "r", encoding="utf-8") as js_file:
+            js_text = js_file.read()
+        return f'<script>{js_text}</script>'
+    print(f"Warning: JS file '{js_file_path}' not found. Skipping embedding.")
+    return regex_match.group(0)
 
 
-def process_html_file(input_filename, output_filename):
-    with open(input_filename, "r", encoding="utf-8") as f:
-        original_content = f.read()
-    modified_content = modify_content(original_content)
-    with open(output_filename, "w", encoding="utf-8") as f:
-        f.write(modified_content)
-    print(f"Saved as {output_filename}")
+def process_html_content(html_content):
+    html_content = re.sub(
+        r'<link rel="stylesheet" href="([^"]+)">', embed_css_inline, html_content)
+    html_content = re.sub(
+        r'<script src="([^"]+)"></script>', embed_js_inline, html_content)
+    html_content = re.sub(
+        r'src="([^"]+)"', replace_src_with_base64, html_content)
+    return minify_html.minify(
+        html_content, minify_css=True, minify_js=True, do_not_minify_doctype=True,
+        ensure_spec_compliant_unquoted_attribute_values=True, keep_spaces_between_attributes=True
+    )
+
+
+def process_html_file(input_file, output_file):
+    with open(input_file, "r", encoding="utf-8") as input_handle:
+        original_html = input_handle.read()
+    modified_html = process_html_content(original_html)
+    with open(output_file, "w", encoding="utf-8") as output_handle:
+        output_handle.write(modified_html)
+    print(f"Saved as {output_file}")
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Convert file references in HTML to base64 data URIs and embed stylesheets.")
-    parser.add_argument("-i", "--input", required=True, help="The input HTML file to process")
-    parser.add_argument("-o", "--output", required=True, help="The output file where modified HTML will be saved")
-    args = parser.parse_args()
-    process_html_file(args.input, args.output)
+    argument_parser = argparse.ArgumentParser(
+        description="Convert file references in HTML to base64 data URIs and embed stylesheets."
+    )
+    argument_parser.add_argument(
+        "-i", "--input", dest="input_file", required=True, help="The input HTML file to process"
+    )
+    argument_parser.add_argument(
+        "-o", "--output", dest="output_file", required=True,
+        help="The output file where modified HTML will be saved"
+    )
+    args = argument_parser.parse_args()
+    process_html_file(args.input_file, args.output_file)
