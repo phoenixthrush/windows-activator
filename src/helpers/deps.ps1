@@ -1,25 +1,36 @@
 Write-Host "Verifying that all dependencies are installed"
 
-$packages = @(
-    'ezwinports.make',
-    'Python.Python.3.13',
-    'Kitware.CMake',
-    'Ninja-build.Ninja',
-    'MartinStorsjo.LLVM-MinGW.UCRT',
-    'UPX.UPX'
-)
+$packagesToCheck = @{
+'ezwinports.make' = 'make'
+'Python.Python.3.13' = 'python'
+'Kitware.CMake' = 'cmake'
+'Ninja-build.Ninja' = 'ninja'
+'MartinStorsjo.LLVM-MinGW.UCRT' = 'gcc'
+'UPX.UPX' = 'upx'
+}
 
 $installedCount = 0
 
-foreach ($package in $packages) {
-    Write-Host $package
-    $packageInstalled = (winget list | Select-String -Pattern $package)
-
-    if (-not $packageInstalled) {
-        $wingetCommand = "winget install $package"
-        Invoke-Expression $wingetCommand
+foreach ($package in $packagesToCheck.Keys) {
+    $commandName = $packagesToCheck[$package]
+    Write-Host $commandName
+    $cmdObj = Get-Command $commandName -ErrorAction SilentlyContinue
+    if ($package -eq 'Python.Python.3.13' -and $cmdObj) {
+        if ($cmdObj.Path -match "WindowsApps") {
+            $cmdObj = $null
+        }
+    }
+    if (-not $cmdObj) {
+        Invoke-Expression "winget install $package"
         $installedCount++
     }
+}
+
+Write-Host "yt-dlp"
+$ytDlpCmd = Get-Command yt-dlp -ErrorAction SilentlyContinue
+if (-not $ytDlpCmd) {
+    pip install yt-dlp
+    $installedCount++
 }
 
 if ($installedCount -gt 1) {
