@@ -1,0 +1,136 @@
+body {
+    margin: auto;
+    height: 100svh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    background-color: black;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    cursor: default;
+}
+
+.container {
+    position: relative;
+    height: 425px;
+    width: 700px;
+    display: flex;
+    justify-content: space-between;
+    overflow: hidden;
+    background-color: black;
+    z-index: 1;
+}
+
+.container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    /* transform: scaleX(-1) translateY(50px); */
+    /* transform: translateY(50px); */
+}
+
+.container h1 {
+    margin-left: 0.75em;
+    font-size: 1.75em;
+    z-index: inherit;
+}
+
+.container button {
+    padding: 0.75em;
+    font-size: 1.25em;
+    height: 15%;
+    margin: 3px;
+    text-align: left;
+    cursor: pointer;
+    /*
+    border-radius: 15px;
+    box-shadow: 15px;
+    */
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    width: 40%;
+    margin: 1.15em;
+    z-index: 3;
+    position: relative;
+}
+
+.btn:active {
+    transform: translateY(5%);
+}
+
+#copyright {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 3%;
+    font-size: 0.75em;
+    color: inherit;
+    text-decoration: none;
+    z-index: 3;
+}
+
+#copyright-img {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 3%;
+    font-size: 0.75em;
+    color: inherit;
+    text-decoration: none;
+    z-index: 3;
+    padding: 0.75em;
+    margin: 3%;
+}
+
+* {
+    /* Disable Text Selection */
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* 700, 450 */
+@media (min-width: 750px) and (min-height: 500px) {
+    body {
+        background-color: #7287fd;
+    }
+
+    /* Debug Borders */
+    .container {
+        border: 1px solid red;
+    }
+
+    .container h1 {
+        border: 1px solid orange;
+    }
+
+    .box {
+        border: 1px solid blue;
+    }
+
+    #copyright {
+        border: 1px solid green;
+    }
+
+    #copyright-img {
+        border: 1px solid green;
+    }
+}
