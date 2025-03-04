@@ -18,3 +18,7 @@ if (Test-Path $activatorPath) {
 } else {
     Write-Host "$activatorPath not found."
 }
+
+if (Test-Path "build/bin/libwebview.dll") {
+    Remove-Item "build/bin/libwebview.dll" -Force
+}
