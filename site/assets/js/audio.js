@@ -1,3 +1,6 @@
+let currentTrack = 0;
+const audio = document.getElementById("audio-player");
+
 async function checkNetwork() {
     return new Promise((resolve) => {
         const audioTest = new Audio("https://.mp3");
@@ -7,22 +10,37 @@ async function checkNetwork() {
     });
 }
 
+const playlist = [
+    "https://download.samplelib.com/mp3/sample-3s.mp3",
+    "https://download.samplelib.com/mp3/sample-6s.mp3",
+    "https://download.samplelib.com/mp3/sample-9s.mp3"
+];
+
 async function setAudioSource() {
-    const audio = document.getElementById("audio-player");
     const online = await checkNetwork();
 
     if (online) {
-        audio.src = "https://.mp3";
+        audio.src = playlist[currentTrack];
+        audio.volume = 0.8;
+        audio.play();
     }
-
-    audio.volume = 0.8;
-
-    // Not needed because of autoplay
-    //  try {
-    //      await audio.play();
-    //  } catch (e) {
-    //      console.error("Autoplay blocked:", e);
-    // }
 }
+
+function nextTrack() {
+    currentTrack = (currentTrack + 1) % playlist.length;
+    setAudioSource();
+}
+
+function shuffleTrack() {
+    let randomIndex;
+    do {
+        randomIndex = Math.floor(Math.random() * playlist.length);
+    } while (randomIndex === currentTrack);
+
+    currentTrack = randomIndex;
+    setAudioSource();
+}
+
+audio.onended = nextTrack;
 
 setAudioSource();
