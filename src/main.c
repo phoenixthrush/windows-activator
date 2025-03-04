@@ -6,6 +6,11 @@
 #include "webview/webview.h"
 #include "common.h"
 
+typedef struct
+{
+    webview_t w;
+} context_t;
+
 #ifdef _WIN32
 #include <windows.h>
 #include "hwid.h"
@@ -33,6 +38,7 @@ int main(void)
 #endif
 
     webview_t w = webview_create(0, NULL);
+    context_t context = {.w = w};
     webview_set_title(w, "Universal Activation Toolkit");
     webview_set_size(w, 700, 450, WEBVIEW_HINT_FIXED);
     webview_set_html(w, (const char *)index_modified_html);
@@ -43,8 +49,8 @@ int main(void)
     webview_bind(w, "vs", vs_cb, NULL);
     webview_bind(w, "vmware", vmware_cb, NULL);
 #endif
-    webview_bind(w, "credits", credits_cb, NULL);
     webview_bind(w, "quit", quit_cb, w);
+    webview_bind(w, "open_browser", open_browser_cb, &context);
 
     webview_run(w);
     webview_destroy(w);
