@@ -1,6 +1,6 @@
 @echo off
 
-where yourcommand.exe >nul 2>nul
+where winget >nul 2>nul
 
 if %errorlevel% neq 0 (
     echo Winget not installed. Installing...
