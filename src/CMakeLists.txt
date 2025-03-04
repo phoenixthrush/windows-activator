@@ -27,7 +27,9 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     GIT_TAG principalis
     PREFIX "${OHOOK_DIR}"
     CONFIGURE_COMMAND ""
-    BUILD_COMMAND cd "${OHOOK_SRC_DIR}" && powershell -ExecutionPolicy Bypass -File "${HELPERS_DIR}/patch.ps1" && make sppc64.dll
+    BUILD_COMMAND
+      COMMAND ${CMAKE_COMMAND} -E chdir "${OHOOK_SRC_DIR}" powershell -ExecutionPolicy Bypass -File "${HELPERS_DIR}/patch.ps1"
+      COMMAND ${CMAKE_COMMAND} -E chdir "${OHOOK_SRC_DIR}" make sppc64.dll
     INSTALL_COMMAND "")
   add_custom_command(
     OUTPUT "${SPPC64_DLL_C}"
@@ -37,11 +39,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 if(MINGW OR WIN32)
-  set(BUILD_SHARED_LIBS OFF)
-  set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -static")
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -static")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -static")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -static")
   add_executable(activator WIN32
     main.c
     common.c
