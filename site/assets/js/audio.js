@@ -24,9 +24,16 @@ async function checkNetwork(url) {
 async function setAudioSource() {
     const online = await checkNetwork(playlist[currentTrack]);
 
+    const copyrightLink = document.getElementById('copyright-audio')
+    copyrightLink.textContent = "Audio Source";
+
     if (online) {
+        audio.removeAttribute("loop");
         audio.src = playlist[currentTrack];
         audio.volume = 0.8;
+        audio.play();
+    } else {
+        // does not work
         audio.play();
     }
 }
@@ -46,6 +53,17 @@ function shuffleTrack() {
     setAudioSource();
 }
 
-audio.onended = nextTrack;
+function browser_audio(link) {
+    if (!link) {
+        link = document.getElementById('audio-player').src
+    }
 
-setAudioSource();
+    try {
+        window.open_browser(link)
+    } catch (e) {
+        window.open(link, "_blank")
+    }
+}
+
+audio.onended = nextTrack;
+shuffleTrack();

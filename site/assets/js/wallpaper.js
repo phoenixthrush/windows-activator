@@ -9,8 +9,6 @@ function browser(link) {
         link = document.getElementById('background').alt
     }
 
-    console.log("now opening " + link)
-
     try {
         window.open_browser(link)
     } catch (e) {
