@@ -7,7 +7,7 @@ ifeq ($(OS),Windows_NT)
 	CHECK_DEPENDENCIES = powershell -ExecutionPolicy Bypass -File "src/helpers/deps.ps1"
 	PACK_USING_UPX = powershell -ExecutionPolicy Bypass -File "src/helpers/pack.ps1"
 
-	RUN = /C "set __COMPAT_LAYER=RUNASINVOKER && start / wait "" ./build/bin/activator"
+	RUN = /C "set __COMPAT_LAYER=RUNASINVOKER && start /wait ./build/bin/activator"
 else
     CREATE_BUILD_DIRECTORY = mkdir -p build build/_deps/ohook/src/ohook/
     DELETE_BUILD_DIRECTORY = rm -rf build
