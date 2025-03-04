@@ -62,7 +62,7 @@ $audioFilePath = "site/assets/audio/keygen-Uh-p3TOIrOc.mp3"
 
 if (-not (Test-Path $audioFilePath)) {
     Write-Host "Audio file not found. Downloading..."
-    yt-dlp -f bestaudio --extract-audio --audio-quality 64K --audio-format mp3 -o $audioFilePath "https://www.youtube.com/watch?v=tPY-I3RX10c"
+    yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o $audioFilePath "https://www.youtube.com/watch?v=tPY-I3RX10c"
 } else {
     Write-Host "Audio file already exists."
 }

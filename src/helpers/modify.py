@@ -19,6 +19,7 @@ def replace_src_with_base64(regex_match):
         mime_type = (
             f"image/{file_extension}" if file_extension in ["png", "jpg", "jpeg", "gif", "webp"]
             else "audio/mpeg" if file_extension == "mp3"
+            else "audio/ogg" if file_extension == "ogg"
             else "application/octet-stream"
         )
         return f'src="data:{mime_type};base64,{base64_string}"'

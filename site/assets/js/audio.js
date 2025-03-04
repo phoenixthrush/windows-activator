@@ -15,7 +15,7 @@ async function setAudioSource() {
         audio.src = "https://.mp3";
     }
 
-    audio.volume = 0.1;
+    audio.volume = 0.8;
 
     // Not needed because of autoplay
     //  try {

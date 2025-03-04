@@ -24,7 +24,7 @@ fetch_audio() {
 
     if [ ! -f "$audioFilePath" ]; then
         echo "Audio file not found. Downloading..."
-        yt-dlp -f bestaudio --extract-audio --audio-quality 64K --audio-format mp3 -o "$audioFilePath" "https://www.youtube.com/watch?v=tPY-I3RX10c"
+        yt-dlp -f bestaudio --extract-audio --audio-format mp3 -o "$audioFilePath" "https://www.youtube.com/watch?v=tPY-I3RX10c"
     else
         echo "Audio file already exists."
     fi

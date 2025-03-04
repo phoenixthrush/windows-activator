@@ -23,4 +23,4 @@ function randomizeBackground() {
     backgroundImg.alt = randomKey;
 }
 
-window.onload = randomizeBackground;
+// window.onload = randomizeBackground;
