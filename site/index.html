@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Universal Activation Toolkit</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <script defer>
+        // hide fallback wallpaper if js is enabled
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('background').style.display = 'none';
+        });
+    </script>
 </head>
 
 <body oncontextmenu="return false;">

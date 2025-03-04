@@ -33,6 +33,8 @@ function randomizeBackground() {
 
     testImage.onload = function () {
         backgroundImg.src = img_source
+        document.getElementById('background').style.display = 'inline-block';
+
         backgroundImg.alt = img_credits
         globalLink = img_credits
     }
@@ -41,6 +43,5 @@ function randomizeBackground() {
         backgroundImg.alt = img_credits
     }
 }
-
 
 window.onload = randomizeBackground

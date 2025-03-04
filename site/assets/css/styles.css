@@ -39,6 +39,7 @@ p {
     height: 100%;
     object-fit: cover;
     z-index: 0;
+    animation: fadeIn 0.3s ease-in-out forwards;
     /* transform: scaleX(-1) translateY(50px); */
     /* transform: translateY(50px); */
 }
@@ -134,5 +135,14 @@ p {
 
     #copyright-img {
         border: 1px solid green;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }
