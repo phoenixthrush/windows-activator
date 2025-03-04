@@ -2,7 +2,7 @@ Write-Host "Verifying that all dependencies are installed"
 
 $packagesToCheck = @{
 'ezwinports.make' = 'make'
-'Python.Python.3.13' = 'python'
+'' = 'python'
 'Kitware.CMake' = 'cmake'
 'Ninja-build.Ninja' = 'ninja'
 'MartinStorsjo.LLVM-MinGW.UCRT' = 'gcc'
@@ -15,13 +15,18 @@ foreach ($package in $packagesToCheck.Keys) {
     $commandName = $packagesToCheck[$package]
     Write-Host $commandName
     $cmdObj = Get-Command $commandName -ErrorAction SilentlyContinue
-    if ($package -eq 'Python.Python.3.13' -and $cmdObj) {
+    if ($commandName -eq 'python' -and $cmdObj) {
         if ($cmdObj.Path -match "WindowsApps") {
             $cmdObj = $null
         }
     }
-    if (-not $cmdObj) {
-        Invoke-Expression "winget install $package"
+    if (-not $cmdObj)
+    {
+        $results = winget search Python.Python
+        $matched = $results | ForEach-Object { if ($_ -match 'Python\.Python\.\S+') { $matches[0] } }
+        $sorted = $matched | Sort-Object { ($_ -replace 'Python\.Python\.', '') -as [version] } -Descending
+        $latest = $sorted | Select-Object -First 1
+        Invoke-Expression "winget install $latest"
         $installedCount++
     }
 }
