@@ -1,3 +1,5 @@
+// this will be optimised and rewritten
+
 #ifndef OHOOK_H
 #define OHOOK_H
 

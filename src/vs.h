@@ -1,3 +1,5 @@
+// this will be optimised and rewritten
+
 #ifndef VS_H
 #define VS_H
 
