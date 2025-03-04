@@ -1,3 +1,5 @@
+// this will be optimised and rewritten
+
 #include <windows.h>
 #include "common.h"
 #include "webview/webview.h"

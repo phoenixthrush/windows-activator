@@ -1,3 +1,5 @@
+// this will be optimised and rewritten
+
 #ifndef VMWARE_H
 #define VMWARE_H
 

@@ -18,8 +18,7 @@ extern unsigned char index_modified_html[];
 extern unsigned int index_modified_html_len;
 
 #ifdef _WIN32
-int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine,
-                   int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow)
 #else
 int main(void)
 #endif

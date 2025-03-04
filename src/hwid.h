@@ -1,3 +1,5 @@
+// this will be optimised and rewritten
+
 #ifndef HWID_H
 #define HWID_H
 
