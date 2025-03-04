@@ -7,9 +7,11 @@
     <title>Universal Activation Toolkit</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <script defer>
-        // hide fallback wallpaper if js is enabled
         document.addEventListener('DOMContentLoaded', function () {
+            // hide fallback wallpaper if js is enabled
             document.getElementById('background').style.display = 'none';
+            // pause fallback audio
+            document.getElementById("audio-player").pause();
         });
     </script>
 </head>

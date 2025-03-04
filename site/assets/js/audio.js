@@ -1,23 +1,28 @@
+const playlist = [
+    "https://archive.org/download/as-if-looking-at-a-distant-place-demetori/01.%20Illusionary%20Night%20~%20Ghostly%20Eyes.mp3",
+    "https://archive.org/download/as-if-looking-at-a-distant-place-demetori/02.%20Bloom%20Nobly%2C%20Ink-Black%20Cherry%20Blossom%20~%20Border%20of%20Life.mp3",
+    "https://archive.org/download/as-if-looking-at-a-distant-place-demetori/03.%20Wind%20Circulation%20~%20Wind%20Tour.mp3",
+    "https://archive.org/download/as-if-looking-at-a-distant-place-demetori/04.%20Paradise%20~%20Deep%20Mountain.mp3",
+    "https://archive.org/download/as-if-looking-at-a-distant-place-demetori/05.%20Sleepless%20Night%20of%20the%20Eastern%20Country.mp3",
+    "https://archive.org/download/as-if-looking-at-a-distant-place-demetori/06.%20The%20Maid%20and%20the%20Pocket%20Watch%20of%20Blood.mp3",
+    "https://archive.org/download/as-if-looking-at-a-distant-place-demetori/07.%20Sakura%2C%20Sakura%20~%20Japanize%20Dream.mp3",
+    "https://archive.org/download/as-if-looking-at-a-distant-place-demetori/08.%20Scarlet%20Tower%20~%20Eastern%20Dream.mp3"
+];
+
 let currentTrack = 0;
 const audio = document.getElementById("audio-player");
 
-async function checkNetwork() {
+async function checkNetwork(url) {
     return new Promise((resolve) => {
-        const audioTest = new Audio("https://.mp3");
+        const audioTest = new Audio(url);
 
         audioTest.oncanplaythrough = () => resolve(true);
         audioTest.onerror = () => resolve(false);
     });
 }
 
-const playlist = [
-    "https://download.samplelib.com/mp3/sample-3s.mp3",
-    "https://download.samplelib.com/mp3/sample-6s.mp3",
-    "https://download.samplelib.com/mp3/sample-9s.mp3"
-];
-
 async function setAudioSource() {
-    const online = await checkNetwork();
+    const online = await checkNetwork(playlist[currentTrack]);
 
     if (online) {
         audio.src = playlist[currentTrack];
