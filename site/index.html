@@ -11,7 +11,9 @@
             // hide fallback wallpaper if js is enabled
             document.getElementById('background').style.display = 'none';
             // pause fallback audio
-            document.getElementById("audio-player").pause();
+            if (!navigator.onLine) {
+                document.getElementById("audio-player").pause();
+            }
         });
     </script>
 </head>
@@ -27,8 +29,11 @@
             <button type="button" class="btn" onclick="window.vmware()">Vmware Workstation</button>
             <button type="button" class="btn" onclick="window.quit()">Quit</button>
         </div>
-        <p id="copyright" onclick="browser('https://www.phoenixthrush.com')">Made By Lulu</p>
-        <p id="copyright-img" onclick="browser()"></a>
+        <div class="copyright-container">
+            <p id="copyright" onclick="browser('https://www.phoenixthrush.com')">Made By Lulu</p>
+            <p id="copyright-img" onclick="browser()"></a>
+            <p id="copyright-audio" onclick="browser_audio()"></a>
+        </div>
     </div>
     <!-- Fallback audio if offline or unreachable -->
     <audio id="audio-player" src="assets/audio/keygen-Uh-p3TOIrOc.mp3" loop autoplay></audio>

@@ -48,6 +48,7 @@ p {
     margin-left: 0.75em;
     font-size: 1.75em;
     z-index: inherit;
+    padding: 0.5em;
 }
 
 .container button {
@@ -71,16 +72,15 @@ p {
     margin: 1.15em;
     z-index: 3;
     position: relative;
+    justify-content: center;
 }
 
 .btn:active {
     transform: translateY(5%);
 }
 
-#copyright {
+#copyright, #copyright-img, #copyright-audio {
     position: absolute;
-    bottom: 0;
-    right: 0;
     font-size: 0.75em;
     color: inherit;
     text-decoration: none;
@@ -90,17 +90,22 @@ p {
     margin: 0;
 }
 
+#copyright {
+    right: 0;
+    bottom: 0;
+}
+
 #copyright-img {
-    position: absolute;
     bottom: 0;
     left: 0;
-    font-size: 0.75em;
-    color: inherit;
-    text-decoration: none;
-    z-index: 3;
-    padding: 2em;
-    cursor: pointer;
-    margin: 0;
+    padding-right: 0;
+}
+
+#copyright-audio {
+    bottom: 0;
+    left: calc(2em * 4);
+    padding-left: 0;
+    margin-left: 1.5em;
 }
 
 * {
@@ -129,11 +134,7 @@ p {
         border: 1px solid blue;
     }
 
-    #copyright {
-        border: 1px solid green;
-    }
-
-    #copyright-img {
+    #copyright, #copyright-img, #copyright-audio {
         border: 1px solid green;
     }
 }
