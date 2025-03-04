@@ -98,6 +98,7 @@ p {
     z-index: 3;
     padding: 0.75em;
     margin: 3%;
+    cursor: pointer;
 }
 
 * {

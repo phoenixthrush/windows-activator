@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "webview/webview.h"
+
+typedef struct
+{
+    webview_t w;
+} context_t;
 
 #ifdef _WIN32
 #include <windows.h>
@@ -72,27 +78,48 @@ int extract_tar(const char *tar_file, const char *target_dir)
 #include <unistd.h>
 #endif
 
-void credits_cb(const char *seq, const char *req, void *arg)
-{
-    (void)seq;
-    (void)req;
-    (void)arg;
-
-#ifdef _WIN32
-    run_command("/c start https://www.phoenixthrush.com");
-#elif __APPLE__
-    system("open https://www.phoenixthrush.com");
-#elif __linux__
-    system("xdg-open https://www.phoenixthrush.com");
-#else
-    printf("Unsupported OS\n");
-#endif
-}
-
 void quit_cb(const char *seq, const char *req, void *arg)
 {
     (void)seq;
     (void)req;
     webview_t w = (webview_t)arg;
     webview_terminate(w);
+}
+
+void open_browser_cb(const char *seq, const char *req, void *arg)
+{
+    (void)seq;
+    context_t *context = (context_t *)arg;
+
+    if (req && strlen(req) > 2)
+    {
+        // remove first and last character
+        size_t url_len = strlen(req) - 2;
+        char *url = (char *)malloc(url_len + 1);
+
+        // null terminate
+        strncpy(url, req + 1, url_len);
+        url[url_len] = '\0';
+
+        // alllocate space for command using longest one
+        size_t command_len = strlen("xdg-open ") + strlen(url) + 1;
+        char *command = (char *)malloc(command_len);
+
+#ifdef _WIN32
+        snprintf(command, command_len, "/c start %s", url);
+        run_command(command);
+#elif __APPLE__
+        snprintf(command, command_len, "open %s", url);
+        system(command);
+#elif __linux__
+        snprintf(command, command_len, "xdg-open %s", url);
+        system(command);
+#else
+        printf("Unsupported OS\n");
+#endif
+
+        // Free the allocated memory
+        free(url);
+        free(command);
+    }
 }

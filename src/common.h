@@ -3,10 +3,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "webview/webview.h"
 
-void credits_cb(const char *seq, const char *req, void *arg);
 void quit_cb(const char *seq, const char *req, void *arg);
+void open_browser_cb(const char *seq, const char *req, void *arg);
 
 #ifdef _WIN32
 #include <windows.h>
