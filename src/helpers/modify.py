@@ -3,9 +3,6 @@ import base64
 import os
 import argparse
 
-# https://docs.rs/minify-html/latest/minify_html/struct.Cfg.html
-import minify_html
-
 
 def convert_file_to_base64(file_path):
     if not os.path.isfile(file_path):
@@ -57,10 +54,19 @@ def process_html_content(html_content):
         r'<script src="([^"]+)"></script>', embed_js_inline, html_content)
     html_content = re.sub(
         r'src="([^"]+)"', replace_src_with_base64, html_content)
-    return minify_html.minify(
-        html_content, minify_css=True, minify_js=True, do_not_minify_doctype=True,
-        ensure_spec_compliant_unquoted_attribute_values=True, keep_spaces_between_attributes=True
-    )
+
+    try:
+        # requires rust
+        # https://docs.rs/minify-html/latest/minify_html/struct.Cfg.html
+        import minify_html
+
+        return minify_html.minify(
+            html_content, minify_css=True, minify_js=True, do_not_minify_doctype=True,
+            ensure_spec_compliant_unquoted_attribute_values=True, keep_spaces_between_attributes=True
+        )
+    except ModuleNotFoundError:
+        print("Skipping minification as minify_html is not installed")
+        return html_content
 
 
 def process_html_file(input_file, output_file):
