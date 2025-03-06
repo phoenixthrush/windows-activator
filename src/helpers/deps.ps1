@@ -3,6 +3,7 @@ Write-Host "Verifying that all dependencies are installed"
 $packagesToCheck = @{
 'ezwinports.make' = 'make'
 '' = 'python'
+'Gyan.FFmpeg.Shared' = 'ffmpeg'
 'Kitware.CMake' = 'cmake'
 'Ninja-build.Ninja' = 'ninja'
 'MartinStorsjo.LLVM-MinGW.UCRT' = 'gcc'
@@ -31,16 +32,16 @@ foreach ($package in $packagesToCheck.Keys) {
     }
 }
 
+if ($installedCount -gt 1) {
+    Write-Host "Please restart the shell and run 'make' again to use the installed packages."
+    exit
+}
+
 Write-Host "yt-dlp"
 $ytDlpCmd = Get-Command yt-dlp -ErrorAction SilentlyContinue
 if (-not $ytDlpCmd) {
     pip install yt-dlp
     $installedCount++
-}
-
-if ($installedCount -gt 1) {
-    Write-Host "Please restart the shell and run 'make' again to use the installed packages."
-    exit
 }
 
 # This is probably not needed since a C compiler should already be installed above

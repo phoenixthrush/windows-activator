@@ -5,7 +5,12 @@ check_dependencies() {
     # todo add missing
     dependencies=(
         "make"
+        "python"
+        "ffmpeg"
         "cmake"
+        "ninja"
+        "gcc"
+        "upx"
         "yt-dlp"
     )
 
