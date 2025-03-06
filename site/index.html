@@ -6,33 +6,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Universal Activation Toolkit</title>
     <link rel="stylesheet" href="assets/css/styles.css">
-    <script defer>
-        document.addEventListener('DOMContentLoaded', function () {
-            // hide fallback wallpaper if js is enabled
-            document.getElementById('background').style.display = 'none';
-            // pause fallback audio
-            if (!navigator.onLine) {
-                document.getElementById("audio-player").pause();
-            }
-        });
+    <script>
+        // hide fallback wallpaper if js is enabled
+        document.getElementById('background').style.display = 'none';
+        // pause fallback audio
+        if (!navigator.onLine) {
+            document.getElementById("audio-player").pause();
+        }
     </script>
 </head>
 
 <body oncontextmenu="return false;">
+    <!-- https://validator.w3.org/nu/#textarea -->
     <div class="container">
         <img src="assets/images/tree.png" alt="touhou" id="background">
         <h1>Universal Activation Toolkit</h1>
         <div class="box">
-            <button type="button" class="btn" onclick="window.activate()">Windows 10/11</button>
-            <button type="button" class="btn" onclick="window.ohook()">Microsoft Office</button>
-            <button type="button" class="btn" onclick="window.vs()">Visual Studio</button>
-            <button type="button" class="btn" onclick="window.vmware()">Vmware Workstation</button>
+            <button type="button" class="btn" onclick="window.activate()">
+                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                    <image href="assets/images/svg/windows.svg" width="20" height="20" class="icon" />
+                </svg> Windows 10/11
+            </button>
+            <button type="button" class="btn" onclick="window.ohook()">
+                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                    <image href="assets/images/svg/office.svg" width="20" height="20" class="icon" />
+                </svg> Microsoft Office
+            </button>
+            <button type="button" class="btn" onclick="window.vs()">
+                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                    <image href="assets/images/svg/visual-studio.svg" width="20" height="20" class="icon" />
+                </svg> Visual Studio
+            </button>
+            <button type="button" class="btn" onclick="window.vmware()">
+                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                    <image href="assets/images/svg/vmware-workstation.svg" width="20" height="20" class="icon" />
+                </svg> Vmware Workstation
+            </button>
+            <!--
+            <button type="button" class="btn" onclick="window.quit()">
+                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                    <image href="assets/images/svg/office.svg" width="20" height="20" class="icon" />
+                </svg> Quit
+            </button>
+            -->
             <button type="button" class="btn" onclick="window.quit()">Quit</button>
         </div>
         <div class="copyright-container">
             <p id="copyright" onclick="browser('https://www.phoenixthrush.com')">Made By Lulu</p>
-            <p id="copyright-img" onclick="browser()"></a>
-            <p id="copyright-audio" onclick="browser_audio()"></a>
+            <p id="copyright-img" onclick="browser()"></p>
+            <p id="copyright-audio" onclick="browser_audio()"></p>
         </div>
     </div>
     <!-- Fallback audio if offline or unreachable -->
