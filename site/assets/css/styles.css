@@ -73,6 +73,10 @@ p {
     justify-content: center;
 }
 
+.box svg {
+    margin-right: 0.35em;
+}
+
 .btn:active {
     transform: translateY(5%);
 }
@@ -139,7 +143,6 @@ p {
 
     .box svg {
         border: 2px solid pink;
-        margin-right: 0.25em;
     }
 
     #copyright, #copyright-img, #copyright-audio {
