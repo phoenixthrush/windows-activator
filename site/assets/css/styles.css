@@ -58,10 +58,8 @@ p {
     margin: 3px;
     text-align: left;
     cursor: pointer;
-    /*
-    border-radius: 15px;
-    box-shadow: 15px;
-    */
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
 }
 
 .box {
@@ -77,6 +75,11 @@ p {
 
 .btn:active {
     transform: translateY(5%);
+}
+
+.icon {
+    width: 100%;
+    height: 100%;
 }
 
 #copyright, #copyright-img, #copyright-audio {
@@ -123,19 +126,24 @@ p {
 
     /* Debug Borders */
     .container {
-        border: 1px solid red;
+        border: 2px solid red;
     }
 
     .container h1 {
-        border: 1px solid orange;
+        border: 2px solid orange;
     }
 
     .box {
-        border: 1px solid blue;
+        border: 2px solid blue;
+    }
+
+    .box svg {
+        border: 2px solid pink;
+        margin-right: 0.25em;
     }
 
     #copyright, #copyright-img, #copyright-audio {
-        border: 1px solid green;
+        border: 2px solid green;
     }
 }
 
