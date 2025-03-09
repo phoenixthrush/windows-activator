@@ -65,5 +65,20 @@ function browser_audio(link) {
     }
 }
 
+document.addEventListener("keydown", (event) => {
+    event.preventDefault();
+    if (event.code === "Space") {
+        audio.paused ? audio.play() : audio.pause();
+    } else if (event.code === "ArrowRight") {
+        audio.currentTime = audio.duration;
+    } else if (event.code === "ArrowLeft") {
+        audio.currentTime = 0;
+    } else if (event.code === "ArrowUp") {
+        audio.volume = Math.min(audio.volume + 0.1, 1);
+    } else if (event.code === "ArrowDown") {
+        audio.volume = Math.max(audio.volume - 0.1, 0);
+    }
+});
+
 audio.onended = nextTrack;
 shuffleTrack();
