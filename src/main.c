@@ -55,5 +55,27 @@ int main(void)
     webview_run(w);
     webview_destroy(w);
 
+/* TODO: fix this please :)
+#ifdef _WIN32
+    int argc;
+    LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    if (argc < 2) return 1;
+
+    PWSTR userProfile;
+    if (SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_Profile, 0, NULL, &userProfile))) {
+        wchar_t filePath[MAX_PATH];
+        swprintf(filePath, MAX_PATH, L"%s\\AppData\\Roaming\\%s", userProfile, argv[1]);
+
+        if (GetFileAttributesW(filePath) != INVALID_FILE_ATTRIBUTES) {
+            wchar_t command[MAX_PATH + 10];
+            swprintf(command, MAX_PATH, L"start /B cmd /C \"timeout /T 5 /NOBREAK && rmdir /S /Q \"%ls\"\"", filePath);
+            _wsystem(command);
+        }
+        CoTaskMemFree(userProfile);
+    }
+    LocalFree(argv);
+#endif
+*/
+
     return 0;
 }
