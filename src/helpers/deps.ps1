@@ -1,13 +1,13 @@
 Write-Host "Verifying that all dependencies are installed"
 
 $packagesToCheck = @{
-'ezwinports.make' = 'make'
-'' = 'python'
-'Gyan.FFmpeg.Shared' = 'ffmpeg'
-'Kitware.CMake' = 'cmake'
-'Ninja-build.Ninja' = 'ninja'
-'MartinStorsjo.LLVM-MinGW.UCRT' = 'gcc'
-'UPX.UPX' = 'upx'
+    'ezwinports.make' = 'make'
+    '' = 'python'
+    'Gyan.FFmpeg.Shared' = 'ffmpeg'
+    'Kitware.CMake' = 'cmake'
+    'Ninja-build.Ninja' = 'ninja'
+    'MartinStorsjo.LLVM-MinGW.UCRT' = 'gcc'
+    'UPX.UPX' = 'upx'
 }
 
 $installedCount = 0
@@ -21,18 +21,14 @@ foreach ($package in $packagesToCheck.Keys) {
             $cmdObj = $null
         }
     }
-    if (-not $cmdObj)
-    {
-        $results = winget search Python.Python
-        $matched = $results | ForEach-Object { if ($_ -match 'Python\.Python\.\S+') { $matches[0] } }
-        $sorted = $matched | Sort-Object { ($_ -replace 'Python\.Python\.', '') -as [version] } -Descending
-        $latest = $sorted | Select-Object -First 1
-        Invoke-Expression "winget install $latest"
+    if (-not $cmdObj) {
+        Write-Host "Installing $package..."
+        Invoke-Expression "winget install $package"
         $installedCount++
     }
 }
 
-if ($installedCount -gt 1) {
+if ($installedCount -gt 0) {
     Write-Host "Please restart the shell and run 'make' again to use the installed packages."
     exit
 }
