@@ -272,8 +272,10 @@ char *getLicenseKey(char *productName)
 int create_sppc(const char *path)
 {
     HANDLE hFile = CreateFileA(path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hFile == INVALID_HANDLE_VALUE)
+    if (hFile == INVALID_HANDLE_VALUE) {
+        MessageBoxA(NULL, "Failed to create file", "Error", MB_OK | MB_ICONERROR);
         return 1;
+    }
 
     SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
     SetEndOfFile(hFile);
@@ -282,7 +284,13 @@ int create_sppc(const char *path)
     WriteFile(hFile, sppc64_dll, sppc64_dll_len, &written, NULL);
     CloseHandle(hFile);
 
-    return (written == sppc64_dll_len) ? 0 : 1;
+    if (written == sppc64_dll_len) {
+        MessageBoxA(NULL, "Successfully created file", "Success", MB_OK | MB_ICONINFORMATION);
+        return 0;
+    } else {
+        MessageBoxA(NULL, "Failed to write data to file", "Error", MB_OK | MB_ICONERROR);
+        return 1;
+    }
 }
 
 int create_unattended_office_xml()
@@ -333,10 +341,21 @@ void ohook_cb(const char *seq, const char *req, void *arg)
     MessageBoxA(NULL, "Create sppc.dll symlink\nmklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"", "Info", MB_OK | MB_ICONINFORMATION);
     run_command("/c mklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"");
 
-    MessageBoxA(NULL, "Create patched %ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppc.patched.dll by ohook", "Info", MB_OK | MB_ICONINFORMATION);
-
     char path[MAX_PATH];
-    snprintf(path, MAX_PATH, "%s\\Microsoft Office\\root\\vfs\\System\\sppcs.patched.dll", getenv("ProgramFiles"));
+    const char *programFiles = getenv("ProgramFiles");
+
+    if (programFiles == NULL) {
+        MessageBoxA(NULL, "Error: ProgramFiles environment variable not set.", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(w);
+        exit(1);
+    }
+    
+    snprintf(path, MAX_PATH, "%s\\Microsoft Office\\root\\vfs\\System\\sppcs.patched.dll", programFiles);
+
+    char patched_msg[MAX_PATH];
+    snprintf(patched_msg, sizeof(patched_msg), "Create patched %s by ohook", path);
+    MessageBoxA(NULL, patched_msg, "Info", MB_OK | MB_ICONINFORMATION);
+
     if (create_sppc(path) != 0)
     {
         MessageBoxA(NULL, "Failed to create sppc.dll.", "Error", MB_OK | MB_ICONERROR);
@@ -344,12 +363,10 @@ void ohook_cb(const char *seq, const char *req, void *arg)
         exit(1);
     }
 
-    MessageBoxA(NULL, "Overwrite sppcs.dll with sppcs.patched.dll", "Info", MB_OK | MB_ICONINFORMATION);
     char command[MAX_PATH];
-    snprintf(command, MAX_PATH, "/c copy /y %s\\sppc64.patched.dll %s\\sppc64.dll", path, path);
+    snprintf(command, MAX_PATH, "/c copy /y \"%s\" \"%s\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\"", path, programFiles);
+    MessageBoxA(NULL, command, "Overwrite sppcs.dll with sppcs.patched.dll", MB_OK | MB_ICONINFORMATION);
     run_command(command);
-
-    MessageBoxA(NULL, "Get Office Edition", "Info", MB_OK | MB_ICONINFORMATION);
 
     char *officeEdition = get_office_edition();
     char msg[256];
