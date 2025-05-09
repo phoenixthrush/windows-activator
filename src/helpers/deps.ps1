@@ -2,12 +2,13 @@ Write-Host "Verifying that all dependencies are installed"
 
 $packagesToCheck = @{
     'ezwinports.make' = 'make'
-    '' = 'python'
+    'Python.Python.3.13' = 'python'
     'Gyan.FFmpeg.Shared' = 'ffmpeg'
     'Kitware.CMake' = 'cmake'
     'Ninja-build.Ninja' = 'ninja'
     'MartinStorsjo.LLVM-MinGW.UCRT' = 'gcc'
     'UPX.UPX' = 'upx'
+    'Git.Git' = 'git'
 }
 
 $installedCount = 0
