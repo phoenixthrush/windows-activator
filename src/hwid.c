@@ -1,17 +1,11 @@
-// this will be optimised and rewritten
-
 #include <windows.h>
 #include <stdio.h>
 #include "webview/webview.h"
 #include "common.h"
-typedef struct
-{
-    char *edition;
-    char *editionKey;
-    char *productKey;
-} WindowsKey;
+#include "hwid.h"
 
-WindowsKey keys[] = {
+// Windows license keys database
+static const windows_license_key_t windows_license_keys[] = {
     {"Education", "Education", "YNMGQ-8RYV3-4PGQ3-C8XTP-7CFBY"},
     {"Education N", "EducationN", "84NGF-MHBT6-FXBX8-QWJK7-DRR8H"},
     {"Enterprise", "Enterprise", "XGVPP-NMH47-7TTHJ-W3FW7-8HV2C"},
@@ -42,204 +36,191 @@ WindowsKey keys[] = {
     {"SE N", "CloudEditionN", "K9VKN-3BGWV-Y624W-MCRMQ-BHDCD"},
     {"Team", "PPIPro", "XKCNC-J26Q9-KFHD2-FKTHY-KD72Y"}};
 
-char *get_edition_id()
+static const size_t windows_license_keys_count = sizeof(windows_license_keys) / sizeof(windows_license_keys[0]);
+
+char *windows_get_edition_id(void)
 {
     static char edition[256];
-    HKEY hKey;
+    HKEY registry_key;
     DWORD size = sizeof(edition);
 
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, KEY_READ, &registry_key) == ERROR_SUCCESS)
     {
-        if (RegQueryValueEx(hKey, "EditionID", NULL, NULL, (LPBYTE)edition, &size) == ERROR_SUCCESS)
+        if (RegQueryValueEx(registry_key, "EditionID", NULL, NULL, (LPBYTE)edition, &size) == ERROR_SUCCESS)
         {
-            RegCloseKey(hKey);
+            RegCloseKey(registry_key);
             return edition;
         }
-        RegCloseKey(hKey);
+        RegCloseKey(registry_key);
     }
     return NULL;
 }
 
-char *get_license_key(const char *edition_id)
+const char *windows_get_license_key_for_edition(const char *edition_id)
 {
     if (!edition_id)
     {
         return NULL;
     }
 
-    for (size_t i = 0; i < sizeof(keys) / sizeof(keys[0]); i++)
+    for (size_t i = 0; i < windows_license_keys_count; i++)
     {
-        if (strcmp(edition_id, keys[i].editionKey) == 0)
+        if (strcmp(edition_id, windows_license_keys[i].edition_id) == 0)
         {
-            return keys[i].productKey;
+            return windows_license_keys[i].product_key;
         }
     }
 
     return NULL;
 }
 
-char *get_os_product_pfn()
+char *windows_get_os_product_pfn(void)
 {
-    static char osProductPfn[256];
-    HKEY hKey;
-    DWORD size = sizeof(osProductPfn);
+    static char os_product_pfn[256];
+    HKEY registry_key;
+    DWORD size = sizeof(os_product_pfn);
 
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\ProductOptions", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\ProductOptions", 0, KEY_READ, &registry_key) == ERROR_SUCCESS)
     {
-        if (RegQueryValueEx(hKey, "OSProductPfn", NULL, NULL, (LPBYTE)osProductPfn, &size) == ERROR_SUCCESS)
+        if (RegQueryValueEx(registry_key, "OSProductPfn", NULL, NULL, (LPBYTE)os_product_pfn, &size) == ERROR_SUCCESS)
         {
-            RegCloseKey(hKey);
-            return osProductPfn;
+            RegCloseKey(registry_key);
+            return os_product_pfn;
         }
-        RegCloseKey(hKey);
+        RegCloseKey(registry_key);
     }
     return NULL;
 }
 
-void set_compatibility_mode(const char *exe_path)
+void windows_set_compatibility_mode(const char *exe_path)
 {
-    HKEY hKey;
-    LONG lResult;
+    HKEY registry_key;
+    LONG result;
 
-    lResult = RegCreateKeyExA(HKEY_CURRENT_USER,
-                              "Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers",
-                              0, NULL, REG_OPTION_NON_VOLATILE,
-                              KEY_WRITE, NULL, &hKey, NULL);
+    result = RegCreateKeyExA(HKEY_CURRENT_USER,
+                             "Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers",
+                             0, NULL, REG_OPTION_NON_VOLATILE,
+                             KEY_WRITE, NULL, &registry_key, NULL);
 
-    if (lResult != ERROR_SUCCESS)
+    if (result != ERROR_SUCCESS)
     {
         MessageBoxA(NULL, "Failed to open or create registry key.", "Error", MB_OK | MB_ICONERROR);
         return;
     }
 
-    // set compatibility mode for Windows XP SP3
-    lResult = RegSetValueExA(hKey,
-                             exe_path,
-                             0,
-                             REG_SZ,
-                             (const BYTE *)"WINXPSP3",
-                             (DWORD)(strlen("WINXPSP3") + 1));
+    // Set compatibility mode for Windows XP SP3
+    result = RegSetValueExA(registry_key,
+                            exe_path,
+                            0,
+                            REG_SZ,
+                            (const BYTE *)"WINXPSP3",
+                            (DWORD)(strlen("WINXPSP3") + 1));
 
-    if (lResult != ERROR_SUCCESS)
+    if (result != ERROR_SUCCESS)
     {
         MessageBoxA(NULL, "Failed to set compatibility mode.", "Error", MB_OK | MB_ICONERROR);
     }
 
-    RegCloseKey(hKey);
+    RegCloseKey(registry_key);
 }
 
-void activate_cb(const char *seq, const char *req, void *arg)
+void webview_windows_activation_callback(const char *seq, const char *req, void *arg)
 {
     (void)seq;
     (void)req;
-    webview_t w = (webview_t)arg;
+    webview_t webview = (webview_t)arg;
 
 #ifdef _WIN32
-    // TODO: add check for internet connectivity
-    // TODO: replace run_command() with actual C code where applicable
+    // Check for internet connectivity
+    if (!system_check_internet_connectivity())
+    {
+        MessageBoxA(NULL, "No internet connection detected", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(webview);
+        exit(1);
+    }
 
-    if (is_admin())
+    if (system_check_admin_privileges())
     {
         MessageBoxA(NULL, "Running as administrator", "Info", MB_OK | MB_ICONINFORMATION);
     }
     else
     {
         MessageBoxA(NULL, "Not running as administrator", "Error", MB_OK | MB_ICONERROR);
-        webview_terminate(w);
+        webview_terminate(webview);
         exit(1);
     }
 
-    /*
-    MessageBoxA(NULL, "Changing Windows Region To USA ", "Info", MB_OK | MB_ICONINFORMATION);
-    run_command("/c powershell -EncodedCommand ZgBvAHIAIAAvAGYAIAAiAHMAawBpAHAAPQAyACAAdABvAGsAZQBuAHMAPQAyACoAIgAgACUAJQBhACAAaQBuACAAKAAnAHIAZQBnACAAcQB1AGUAcgB5ACAAIgBIAEsAQwBVAFwAQwBvAG4AdAByAG8AbAAgAFAAYQBuAGUAbABcAEkAbgB0AGUAcgBuAGEAdABpAG8AbgBhAGwAXABHAGUAbwAiACAALwB2ACAATgBhAG0AZQAgACUAbgB1AGwANgAlACcAKQAgAGQAbwAgAHMAZQB0ACAAIgBuAGEAbQBlAD0AJQAlAGIAIgAKAGYAbwByACAALwBmACAAIgBzAGsAaQBwAD0AMgAgAHQAbwBrAGUAbgBzAD0AMgAqACIAIAAlACUAYQAgAGkAbgAgACgAJwByAGUAZwAgAHEAdQBlAHIAeQAgACIASABLAEMAVQBcAEMAbwBuAHQAcgBvAGwAIABQAGEAbgBlAGwAXABJAG4AdABlAHIAbgBhAHQAaQBvAG4AYQBsAFwARwBlAG8AIgAgAC8AdgAgAE4AYQB0AGkAbwBuACAAJQBuAHUAbAA2ACUAJwApACAAZABvACAAcwBlAHQAIAAiAG4AYQB0AGkAbwBuAD0AJQAlAGIAIgAKAAoAcwBlAHQAIAByAGUAZwBpAG8AbgBjAGgAYQBuAGcAZQA9AAoAaQBmACAAbgBvAHQAIAAiACUAbgBhAG0AZQAlACIAPQA9ACIAVQBTACIAIAAoAAoAcwBlAHQAIAByAGUAZwBpAG8AbgBjAGgAYQBuAGcAZQA9ADEACgAlAHAAcwBjACUAIAAiAFMAZQB0AC0AVwBpAG4ASABvAG0AZQBMAG8AYwBhAHQAaQBvAG4AIAAtAEcAZQBvAEkAZAAgADIANAA0ACIAIAAlAG4AdQBsACUACgBpAGYAIAAhAGUAcgByAG8AcgBsAGUAdgBlAGwAIQAgAEUAUQBVACAAMAAgACgACgBlAGMAaABvACAAQwBoAGEAbgBnAGkAbgBnACAAVwBpAG4AZABvAHcAcwAgAFIAZQBnAGkAbwBuACAAVABvACAAVQBTAEEAIAAgACAAIAAgACAAIAAgACAAIABbAFMAdQBjAGMAZQBzAHMAZgB1AGwAXQAKACkAIABlAGwAcwBlACAAKAAKAGMAYQBsAGwAIAA6AGQAawBfAGMAbwBsAG8AcgAgACUAUgBlAGQAJQAgACIAQwBoAGEAbgBnAGkAbgBnACAAVwBpAG4AZABvAHcAcwAgAFIAZQBnAGkAbwBuACAAVABvACAAVQBTAEEAIAAgACAAIAAgACAAIAAgACAAIABbAEYAYQBpAGwAZQBkAF0AIgAKACkACgApAA==");
-    */
-
-    char *edition = get_edition_id();
+    char *edition = windows_get_edition_id();
     if (edition)
     {
-        char msg[512];
-        snprintf(msg, sizeof(msg), "Edition ID: %s", edition);
-        MessageBoxA(NULL, msg, "Info", MB_OK | MB_ICONINFORMATION);
+        char message[512];
+        snprintf(message, sizeof(message), "Edition ID: %s", edition);
+        MessageBoxA(NULL, message, "Info", MB_OK | MB_ICONINFORMATION);
     }
     else
     {
         MessageBoxA(NULL, "Failed to retrieve Edition ID", "Error", MB_OK | MB_ICONERROR);
-        webview_terminate(w);
+        webview_terminate(webview);
         exit(1);
     }
 
-    char *key = get_license_key(edition);
-    if (key)
+    const char *license_key = windows_get_license_key_for_edition(edition);
+    if (license_key)
     {
-        char msg[512];
-        snprintf(msg, sizeof(msg), "Matching License Key: %s", key);
-        MessageBoxA(NULL, msg, "Info", MB_OK | MB_ICONINFORMATION);
+        char message[512];
+        snprintf(message, sizeof(message), "Matching License Key: %s", license_key);
+        MessageBoxA(NULL, message, "Info", MB_OK | MB_ICONINFORMATION);
     }
     else
     {
         MessageBoxA(NULL, "No matching license key found", "Error", MB_OK | MB_ICONERROR);
-        webview_terminate(w);
+        webview_terminate(webview);
         exit(1);
     }
 
     MessageBoxA(NULL, "Apply generic Retail/OEM/MAK Key", "Info", MB_OK | MB_ICONINFORMATION);
     char command[512];
-    snprintf(command, sizeof(command), "/c slmgr /ipk %s", key);
-    run_command(command);
-
-    // using pre generated universal ticket
-    /*
-    char *osProductPfn = get_os_product_pfn();
-    if (osProductPfn)
-    {
-        char msg[512];
-        snprintf(msg, sizeof(msg), "OSProductPfn: %s", osProductPfn);
-        MessageBoxA(NULL, msg, "Info", MB_OK | MB_ICONINFORMATION);
-    }
-    else
-    {
-        MessageBoxA(NULL, "Failed to read OSProductPfn", "Error", MB_OK | MB_ICONERROR);
-        webview_terminate(w);
-        exit(1);
-    }
-
-    char command[2048];
-    snprintf(command, sizeof(command),
-             "/c powershell -Command \"Invoke-WebRequest -Uri 'https://gist.github.com/phoenixthrush/4c295a1176298a04acd2353aaef8a71e/raw/aeebac03771684b8e04867d76a01604df63076d6/%s.xml' -OutFile 'C:\\\\ProgramData\\\\Microsoft\\\\Windows\\\\ClipSVC\\\\GenuineTicket.xml'\"",
-             osProductPfn);
-
-    run_command(command);
-    */
+    snprintf(command, sizeof(command), "/c slmgr /ipk %s", license_key);
+    system_execute_command_elevated(command);
 
     MessageBoxA(NULL, "Create folder at C:\\Files if not exists", "Info", MB_OK | MB_ICONINFORMATION);
-    const char *dir = "C:\\Files";
-    if (GetFileAttributes(dir) == INVALID_FILE_ATTRIBUTES)
+    const char *files_directory = "C:\\Files";
+    if (GetFileAttributes(files_directory) == INVALID_FILE_ATTRIBUTES)
     {
-        CreateDirectory(dir, NULL);
+        CreateDirectory(files_directory, NULL);
     }
 
     MessageBoxA(NULL, "Download MS ADK file to C:\\Files\nThis will take some time, please wait :)", "Info", MB_OK | MB_ICONINFORMATION);
-    // run_command("/c powershell -c Start-BitsTransfer -Source \"https://download.microsoft.com/download/9/A/E/9AE69DD5-BA93-44E0-864E-180F5E700AB4/adk/Installers/14f4df8a2a7fc82a4f415cf6a341415d.cab\" -Destination \"C:\\Files\\14f4df8a2a7fc82a4f415cf6a341415d.cab\"");
-    download_file("https://download.microsoft.com/download/9/A/E/9AE69DD5-BA93-44E0-864E-180F5E700AB4/adk/Installers/14f4df8a2a7fc82a4f415cf6a341415d.cab", "C:/Files/14f4df8a2a7fc82a4f415cf6a341415d.cab");
+    system_download_file("https://download.microsoft.com/download/9/A/E/9AE69DD5-BA93-44E0-864E-180F5E700AB4/adk/Installers/14f4df8a2a7fc82a4f415cf6a341415d.cab", "C:/Files/14f4df8a2a7fc82a4f415cf6a341415d.cab");
 
     MessageBoxA(NULL, "Expand ADK files to C:\\Files\nThis will take some time, please wait :)", "Info", MB_OK | MB_ICONINFORMATION);
-    run_command("/c expand C:\\Files\\14f4df8a2a7fc82a4f415cf6a341415d.cab -F:* C:\\Files\\");
+    system_execute_command_elevated("/c expand C:\\Files\\14f4df8a2a7fc82a4f415cf6a341415d.cab -F:* C:\\Files\\");
 
     if (rename("C:\\Files\\filf8377e82b29deadca67bc4858ed3fba9", "C:\\Files\\gatherosstate.exe") != 0)
     {
         MessageBoxA(NULL, "Failed to rename C:\\Files\\filf8377e82b29deadca67bc4858ed3fba9 to C:\\Files\\gatherosstate.exe", "Error", MB_OK | MB_ICONERROR);
-        webview_terminate(w);
+        webview_terminate(webview);
         exit(1);
     }
 
     MessageBoxA(NULL, "Patch C:\\Files\\gatherosstate.exe based on GamersOsState", "Info", MB_OK | MB_ICONINFORMATION);
-    run_command("/c powershell -EncodedCommand JABiAHkAdABlAHMAIAAgAD0AIABbAFMAeQBzAHQAZQBtAC4ASQBPAC4ARgBpAGwAZQBdADoAOgBSAGUAYQBkAEEAbABsAEIAeQB0AGUAcwAoACIAQwA6AFwARgBpAGwAZQBzAFwAZwBhAHQAaABlAHIAbwBzAHMAdABhAHQAZQAuAGUAeABlACIAKQAKACQAYgB5AHQAZQBzAFsAMwAyADAAXQAgAD0AIAAwAHgAZgA4AAoAJABiAHkAdABlAHMAWwAzADIAMQBdACAAPQAgADAAeABmAGIACgAkAGIAeQB0AGUAcwBbADMAMgAyAF0AIAA9ACAAMAB4ADAANQAKACQAYgB5AHQAZQBzAFsAMwAyADQAXQAgAD0AIAAwAHgAMAAzAAoAJABiAHkAdABlAHMAWwAxADMANgA3ADIAXQAgAD0AIAAwAHgAMgA1AAoAJABiAHkAdABlAHMAWwAxADMANgA3ADQAXQAgAD0AIAAwAHgANwAzAAoAJABiAHkAdABlAHMAWwAxADMANgA3ADYAXQAgAD0AIAAwAHgAMwBiAAoAJABiAHkAdABlAHMAWwAxADMANgA3ADgAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAxADMANgA4ADAAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAxADMANgA4ADIAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAxADMANgA4ADQAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIANwA0ADgAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADIANwA0ADkAXQAgAD0AIAAwAHgAOQBlAAoAJABiAHkAdABlAHMAWwAzADIANwA1ADAAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIANwA1ADEAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIANwA1ADIAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIAOAA5ADQAXQAgAD0AIAAwAHgAOABiAAoAJABiAHkAdABlAHMAWwAzADIAOAA5ADUAXQAgAD0AIAAwAHgANAA0AAoAJABiAHkAdABlAHMAWwAzADIAOAA5ADcAXQAgAD0AIAAwAHgANgA0AAoAJABiAHkAdABlAHMAWwAzADIAOAA5ADgAXQAgAD0AIAAwAHgAOAA1AAoAJABiAHkAdABlAHMAWwAzADIAOAA5ADkAXQAgAD0AIAAwAHgAYwAwAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADAAXQAgAD0AIAAwAHgAMABmAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADEAXQAgAD0AIAAwAHgAOAA1AAoAJABiAHkAdABlAHMAWwAzADIAOQAwADIAXQAgAD0AIAAwAHgAMQBjAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADMAXQAgAD0AIAAwAHgAMAAyAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADQAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADYAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADIAOQAwADcAXQAgAD0AIAAwAHgAMwBjAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADgAXQAgAD0AIAAwAHgAMAAxAAoAJABiAHkAdABlAHMAWwAzADIAOQAwADkAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADAAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADEAXQAgAD0AIAAwAHgAOAA1AAoAJABiAHkAdABlAHMAWwAzADIAOQAxADIAXQAgAD0AIAAwAHgAZABiAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADMAXQAgAD0AIAAwAHgANwA1AAoAJABiAHkAdABlAHMAWwAzADIAOQAxADQAXQAgAD0AIAAwAHgAZQBiAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADUAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADIAOQAxADYAXQAgAD0AIAAwAHgANgA5AAoAJABiAHkAdABlAHMAWwAzADIAOQAxADcAXQAgAD0AIAAwAHgAZgBmAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADgAXQAgAD0AIAAwAHgAZgBmAAoAJABiAHkAdABlAHMAWwAzADIAOQAxADkAXQAgAD0AIAAwAHgAZgBmAAoAJABiAHkAdABlAHMAWwAzADMAMAA5ADQAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADMAMAA5ADUAXQAgAD0AIAAwAHgAOAAwAAoAJABiAHkAdABlAHMAWwAzADMAMAA5ADYAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADMAMAA5ADcAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADMAMAA5ADgAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADMANAA0ADkAXQAgAD0AIAAwAHgANgA0AAoAJABiAHkAdABlAHMAWwAzADMANQA3ADYAXQAgAD0AIAAwAHgAOABkAAoAJABiAHkAdABlAHMAWwAzADMANQA3ADcAXQAgAD0AIAAwAHgANQA0AAoAJABiAHkAdABlAHMAWwAzADMANQA3ADkAXQAgAD0AIAAwAHgAMgA0AAoAJABiAHkAdABlAHMAWwAzADMANQA4ADAAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADMANQA4ADEAXQAgAD0AIAAwAHgANQA1AAoAJABiAHkAdABlAHMAWwAzADMANQA4ADIAXQAgAD0AIAAwAHgAMAAxAAoAJABiAHkAdABlAHMAWwAzADMANQA4ADMAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADMANQA4ADQAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADMAOQA3ADgAXQAgAD0AIAAwAHgAYwAzAAoAJABiAHkAdABlAHMAWwAzADQAMQA4ADkAXQAgAD0AIAAwAHgANQA5AAoAJABiAHkAdABlAHMAWwAzADQAMQA5ADAAXQAgAD0AIAAwAHgAZQBiAAoAJABiAHkAdABlAHMAWwAzADQAMQA5ADEAXQAgAD0AIAAwAHgAMgA4AAoAJABiAHkAdABlAHMAWwAzADQAMgAzADgAXQAgAD0AIAAwAHgAZQA5AAoAJABiAHkAdABlAHMAWwAzADQAMgAzADkAXQAgAD0AIAAwAHgANABmAAoAJABiAHkAdABlAHMAWwAzADQAMgA0ADAAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADQAMgA0ADEAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADQAMgA0ADIAXQAgAD0AIAAwAHgAMAAwAAoAJABiAHkAdABlAHMAWwAzADQAMwA0ADYAXQAgAD0AIAAwAHgAMgA0AAoAJABiAHkAdABlAHMAWwAzADQAMwA3ADYAXQAgAD0AIAAwAHgAZQBiAAoAJABiAHkAdABlAHMAWwAzADQAMwA3ADcAXQAgAD0AIAAwAHgANgAzAAoAWwBTAHkAcwB0AGUAbQAuAEkATwAuAEYAaQBsAGUAXQA6ADoAVwByAGkAdABlAEEAbABsAEIAeQB0AGUAcwAoACIAQwA6AFwARgBpAGwAZQBzAFwAZwBhAHQAaABlAHIAbwBzAHMAdABhAHQAZQBtAG8AZABpAGYAaQBlAGQALgBlAHgAZQAiACwAIAAkAGIAeQB0AGUAcwApAA==");
+    if (system_patch_gatherosstate_file("C:\\Files\\gatherosstate.exe", "C:\\Files\\gatherosstatemodified.exe") != 0)
+    {
+        MessageBoxA(NULL, "Failed to patch gatherosstate.exe", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(webview);
+        exit(1);
+    }
 
     MessageBoxA(NULL, "Set compatibility layer of C:\\Files\\gatherosstatemodified.exe to Windows XP SP3", "Info", MB_OK | MB_ICONINFORMATION);
-    set_compatibility_mode("C:\\Files\\gatherosstatemodified.exe");
+    windows_set_compatibility_mode("C:\\Files\\gatherosstatemodified.exe");
 
     MessageBoxA(NULL, "Generate C:\\Files\\GenuineTicket.xml", "Info", MB_OK | MB_ICONINFORMATION);
-    run_command("/c powershell -c $value = (Get-ItemProperty HKLM:\\SYSTEM\\CurrentControlSet\\Control\\ProductOptions).OSProductPfn; C:\\Files\\gatherosstatemodified.exe /c Pfn=$value`;PKeyIID=465145217131314304264339481117862266242033457260311819664735280");
+    if (windows_generate_genuine_ticket("C:\\Files\\gatherosstatemodified.exe", "C:\\Files") != 0)
+    {
+        MessageBoxA(NULL, "Failed to generate genuine ticket", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(webview);
+        exit(1);
+    }
 
     MessageBoxA(NULL, "Copy C:\\Files\\GenuineTicket.xml to C:\\ProgramData\\Microsoft\\Windows\\ClipSVC\\GenuineTicket\\GenuineTicket.xml", "Info", MB_OK | MB_ICONINFORMATION);
     if (!CopyFile("C:\\Files\\GenuineTicket.xml", "C:\\ProgramData\\Microsoft\\Windows\\ClipSVC\\GenuineTicket\\GenuineTicket.xml", FALSE))
@@ -248,14 +229,48 @@ void activate_cb(const char *seq, const char *req, void *arg)
     }
 
     MessageBoxA(NULL, "Apply C:\\Files\\GenuineTicket.xml", "Info", MB_OK | MB_ICONINFORMATION);
-    run_command("/c clipup -v -o");
+    system_execute_command_elevated("/c clipup -v -o");
 
     MessageBoxA(NULL, "Activate Windows", "Info", MB_OK | MB_ICONINFORMATION);
-    run_command("/c slmgr /ato");
+    system_execute_command_elevated("/c slmgr /ato");
 
     MessageBoxA(NULL, "Delete leftovers", "Info", MB_OK | MB_ICONINFORMATION);
-    run_command("/c powershell -c Remove-Item -Path C:\\Files -Recurse -Force");
+    system_delete_directory_recursive("C:\\Files");
 #else
     printf("Unsupported OS\n");
 #endif
+}
+
+int windows_generate_genuine_ticket(const char *exe_path, const char *output_dir)
+{
+    // Get OSProductPfn from registry
+    char os_product_pfn[256];
+    HKEY registry_key;
+    DWORD size = sizeof(os_product_pfn);
+
+    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\ProductOptions", 0, KEY_READ, &registry_key) != ERROR_SUCCESS)
+    {
+        MessageBoxA(NULL, "Failed to open registry key for OSProductPfn", "Error", MB_OK | MB_ICONERROR);
+        return 1;
+    }
+
+    if (RegQueryValueEx(registry_key, "OSProductPfn", NULL, NULL, (LPBYTE)os_product_pfn, &size) != ERROR_SUCCESS)
+    {
+        MessageBoxA(NULL, "Failed to read OSProductPfn from registry", "Error", MB_OK | MB_ICONERROR);
+        RegCloseKey(registry_key);
+        return 1;
+    }
+
+    RegCloseKey(registry_key);
+
+    // Build command to run gatherosstate
+    char command[1024];
+    snprintf(command, sizeof(command), "/c \"%s\" /c Pfn=%s`;PKeyIID=465145217131314304264339481117862266242033457260311819664735280",
+             exe_path, os_product_pfn);
+
+    // Change to output directory for execution
+    SetCurrentDirectory(output_dir);
+
+    system_execute_command_elevated(command);
+    return 0;
 }

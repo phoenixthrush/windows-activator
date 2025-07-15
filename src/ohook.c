@@ -5,24 +5,24 @@
 #include "webview/webview.h"
 #include "common.h"
 
-extern unsigned char sppc64_dll[];
-extern unsigned int sppc64_dll_len;
+extern unsigned char sppc64[];
+extern unsigned int sppc64_len;
 
 typedef struct
 {
-    char *version;
-    char *product;
-    char *generatedKey;
-    char *keyType;
-} OfficeKey;
+    const char *version;
+    const char *product;
+    const char *generated_key;
+    const char *key_type;
+} office_license_key_t;
 
 struct Software
 {
-    char *product;
-    char *generatedKey;
+    const char *product;
+    const char *generated_key;
 };
 
-OfficeKey officeKeys[] = {
+office_license_key_t office_license_keys[] = {
     {"v15.0 (2013)", "AccessRetail", "B7RFY-7NXPK-Q4342-Y9X2H-3JX4X", "Retail"},
     {"v15.0 (2013)", "AccessRuntimeRetail", "X3XNB-HJB7K-66THH-8DWQ3-XHGJP", "Bypass"},
     {"v15.0 (2013)", "AccessVolume", "9MF9G-CN32B-HV7XT-9XJ8T-9KVF4", "MAK"},
@@ -222,6 +222,18 @@ OfficeKey officeKeys[] = {
     {"v16.0 (2024)", "Word2024Retail", "XN33R-RP676-GMY2F-T3MH7-GCVKR", "Retail"},
     {"v16.0 (2024)", "Word2024Volume", "WD8CQ-6KNQM-8W2CX-2RT63-KK3TP", "MAK-AE"}};
 
+const char *office_get_license_key_for_product(const char *product_name)
+{
+    for (int i = 0; i < sizeof(office_license_keys) / sizeof(office_license_keys[0]); i++)
+    {
+        if (strcmp(office_license_keys[i].product, product_name) == 0)
+        {
+            return office_license_keys[i].generated_key;
+        }
+    }
+    return NULL;
+}
+
 struct Software software[] = {
     {"SQL Server 2022 Enterprise", "J4V48-P8MM4-9N3J9-HD97X-DYMRM"},
     {"SQL Server 2022 Enterprise Core", "2Q48Q-PB48J-DRCVN-GB844-X2H4Q"},
@@ -259,11 +271,11 @@ char *get_office_edition()
 
 char *getLicenseKey(char *productName)
 {
-    for (int i = 0; i < sizeof(officeKeys) / sizeof(officeKeys[0]); i++)
+    for (int i = 0; i < sizeof(office_license_keys) / sizeof(office_license_keys[0]); i++)
     {
-        if (strcmp(officeKeys[i].product, productName) == 0)
+        if (strcmp(office_license_keys[i].product, productName) == 0)
         {
-            return officeKeys[i].generatedKey;
+            return (char *)office_license_keys[i].generated_key;
         }
     }
     return NULL;
@@ -272,7 +284,8 @@ char *getLicenseKey(char *productName)
 int create_sppc(const char *path)
 {
     HANDLE hFile = CreateFileA(path, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hFile == INVALID_HANDLE_VALUE) {
+    if (hFile == INVALID_HANDLE_VALUE)
+    {
         MessageBoxA(NULL, "Failed to create file", "Error", MB_OK | MB_ICONERROR);
         return 1;
     }
@@ -281,13 +294,16 @@ int create_sppc(const char *path)
     SetEndOfFile(hFile);
 
     DWORD written;
-    WriteFile(hFile, sppc64_dll, sppc64_dll_len, &written, NULL);
+    WriteFile(hFile, sppc64, sppc64_len, &written, NULL);
     CloseHandle(hFile);
 
-    if (written == sppc64_dll_len) {
+    if (written == sppc64_len)
+    {
         MessageBoxA(NULL, "Successfully created file", "Success", MB_OK | MB_ICONINFORMATION);
         return 0;
-    } else {
+    }
+    else
+    {
         MessageBoxA(NULL, "Failed to write data to file", "Error", MB_OK | MB_ICONERROR);
         return 1;
     }
@@ -327,7 +343,7 @@ void ohook_cb(const char *seq, const char *req, void *arg)
 
     if (MessageBoxA(NULL, "Do you want to download Office 365?", "Info", MB_YESNO | MB_ICONQUESTION) == IDYES)
     {
-        download_file("https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=O365ProPlusRetail&platform=x64&language=en-us&version=O16GA", "C:/Windows/Temp/OfficeSetup.exe");
+        system_download_file("https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=O365ProPlusRetail&platform=x64&language=en-us&version=O16GA", "C:/Windows/Temp/OfficeSetup.exe");
 
         /*
         MessageBoxA(NULL, "Create unattended Office configuration XML", "Info", MB_OK | MB_ICONINFORMATION);
@@ -335,21 +351,22 @@ void ohook_cb(const char *seq, const char *req, void *arg)
         */
 
         MessageBoxA(NULL, "Start Office installation", "Info", MB_OK | MB_ICONINFORMATION);
-        run_command("/c start /wait C:/Windows/Temp/OfficeSetup.exe");
+        system_execute_command_elevated("/c start /wait C:/Windows/Temp/OfficeSetup.exe");
     }
 
     MessageBoxA(NULL, "Create sppc.dll symlink\nmklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"", "Info", MB_OK | MB_ICONINFORMATION);
-    run_command("/c mklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"");
+    system_execute_command_elevated("/c mklink \"%ProgramFiles%\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\" \"%windir%\\System32\\sppc.dll\"");
 
     char path[MAX_PATH];
     const char *programFiles = getenv("ProgramFiles");
 
-    if (programFiles == NULL) {
+    if (programFiles == NULL)
+    {
         MessageBoxA(NULL, "Error: ProgramFiles environment variable not set.", "Error", MB_OK | MB_ICONERROR);
         webview_terminate(w);
         exit(1);
     }
-    
+
     snprintf(path, MAX_PATH, "%s\\Microsoft Office\\root\\vfs\\System\\sppcs.patched.dll", programFiles);
 
     char patched_msg[MAX_PATH];
@@ -366,7 +383,7 @@ void ohook_cb(const char *seq, const char *req, void *arg)
     char command[MAX_PATH];
     snprintf(command, MAX_PATH, "/c copy /y \"%s\" \"%s\\Microsoft Office\\root\\vfs\\System\\sppcs.dll\"", path, programFiles);
     MessageBoxA(NULL, command, "Overwrite sppcs.dll with sppcs.patched.dll", MB_OK | MB_ICONINFORMATION);
-    run_command(command);
+    system_execute_command_elevated(command);
 
     char *officeEdition = get_office_edition();
     char msg[256];
@@ -384,7 +401,7 @@ void ohook_cb(const char *seq, const char *req, void *arg)
         MessageBoxA(NULL, "Activate Office", "Info", MB_OK | MB_ICONINFORMATION);
         char command[512];
         snprintf(command, sizeof(command), "/c slmgr /ipk %s", licenseKey);
-        run_command(command);
+        system_execute_command_elevated(command);
     }
     else
     {
@@ -394,5 +411,63 @@ void ohook_cb(const char *seq, const char *req, void *arg)
     }
 #else
     printf("Unsupported OS\n");
+#endif
+}
+
+void webview_office_activation_callback(const char *seq, const char *req, void *arg)
+{
+    (void)seq;
+    (void)req;
+    webview_t webview = (webview_t)arg;
+
+#ifdef _WIN32
+    if (!system_check_admin_privileges())
+    {
+        MessageBoxA(NULL, "Administrator privileges required for Office activation", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(webview);
+        exit(1);
+    }
+
+    char *office_edition = get_office_edition();
+    if (!office_edition)
+    {
+        MessageBoxA(NULL, "Failed to retrieve Office edition", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(webview);
+        exit(1);
+    }
+
+    char *license_key = getLicenseKey(office_edition);
+    if (license_key)
+    {
+        char message[512];
+        snprintf(message, sizeof(message), "Found Office edition: %s\nUsing license key: %s", office_edition, license_key);
+        MessageBoxA(NULL, message, "Office Activation", MB_OK | MB_ICONINFORMATION);
+
+        // Create sppc64.dll for activation bypass
+        const char *sppc_path = "C:\\Windows\\System32\\sppc64.dll";
+        if (create_sppc(sppc_path) == 0)
+        {
+            MessageBoxA(NULL, "Successfully created sppc64.dll bypass", "Info", MB_OK | MB_ICONINFORMATION);
+        }
+        else
+        {
+            MessageBoxA(NULL, "Failed to create sppc64.dll bypass", "Warning", MB_OK | MB_ICONWARNING);
+        }
+
+        // Apply license key
+        char command[512];
+        snprintf(command, sizeof(command), "/c slmgr /ipk %s", license_key);
+        system_execute_command_elevated(command);
+
+        MessageBoxA(NULL, "Office activation completed", "Success", MB_OK | MB_ICONINFORMATION);
+    }
+    else
+    {
+        MessageBoxA(NULL, "No matching license key found for this Office edition", "Error", MB_OK | MB_ICONERROR);
+        webview_terminate(webview);
+        exit(1);
+    }
+#else
+    printf("Office activation is only supported on Windows\n");
 #endif
 }

@@ -4,63 +4,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Universal Activation Toolkit for Windows, Office, Visual Studio, and VMware">
     <title>Universal Activation Toolkit</title>
     <link rel="stylesheet" href="assets/css/styles.css">
-    <script>
-        // hide fallback wallpaper if js is enabled
-        document.getElementById('background').style.display = 'none';
-        // pause fallback audio
-        if (!navigator.onLine) {
-            document.getElementById("audio-player").pause();
+    <link rel="preload" href="assets/images/tree.webp" as="image" type="image/webp">
+    <style>
+        /* Critical CSS - prevent layout shift */
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Trebuchet MS', sans-serif;
         }
-    </script>
+
+        .container {
+            position: relative;
+            height: 425px;
+            width: 700px;
+            margin: auto;
+        }
+
+        #background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 1;
+            filter: brightness(0.7);
+        }
+    </style>
 </head>
 
-<body oncontextmenu="return false;">
-    <!-- https://validator.w3.org/nu/#textarea -->
-    <div class="container">
-        <img src="assets/images/tree.png" alt="touhou" id="background">
-        <h1>Universal Activation Toolkit</h1>
-        <div class="box">
-            <button type="button" class="btn" onclick="window.activate()">
-                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-                    <image href="assets/images/svg/windows.svg" width="20" height="20" class="icon" />
-                </svg> Windows 10/11
+<body>
+    <main class="container" role="main">
+        <img src="assets/images/tree.webp" alt="Background" id="background" loading="eager"
+            onload="this.style.opacity='1'; this.classList.add('loaded');"
+            onerror="this.style.opacity='1'; this.classList.add('loaded');">
+        <header>
+            <h1>Universal Activation Toolkit</h1>
+        </header>
+
+        <section class="activation-buttons" role="group" aria-label="Activation tools">
+            <button type="button" class="btn" onclick="window.activate()" aria-describedby="windows-desc">
+                <img src="assets/images/svg/windows.svg" width="20" height="20" alt="" aria-hidden="true">
+                <span>Windows 10/11</span>
             </button>
-            <button type="button" class="btn" onclick="window.ohook()">
-                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-                    <image href="assets/images/svg/office.svg" width="20" height="20" class="icon" />
-                </svg> Microsoft Office
+
+            <button type="button" class="btn" onclick="window.ohook()" aria-describedby="office-desc">
+                <img src="assets/images/svg/office.svg" width="20" height="20" alt="" aria-hidden="true">
+                <span>Microsoft Office</span>
             </button>
-            <button type="button" class="btn" onclick="window.vs()">
-                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-                    <image href="assets/images/svg/visual-studio.svg" width="20" height="20" class="icon" />
-                </svg> Visual Studio
+
+            <button type="button" class="btn" onclick="window.vs()" aria-describedby="vs-desc">
+                <img src="assets/images/svg/visual-studio.svg" width="20" height="20" alt="" aria-hidden="true">
+                <span>Visual Studio</span>
             </button>
-            <button type="button" class="btn" onclick="window.vmware()">
-                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-                    <image href="assets/images/svg/vmware-workstation.svg" width="20" height="20" class="icon" />
-                </svg> Vmware Workstation
+
+            <button type="button" class="btn" onclick="window.vmware()" aria-describedby="vmware-desc">
+                <img src="assets/images/svg/vmware-workstation.svg" width="20" height="20" alt="" aria-hidden="true">
+                <span>VMware Workstation</span>
             </button>
-            <!--
-            <button type="button" class="btn" onclick="window.quit()">
-                <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-                    <image href="assets/images/svg/office.svg" width="20" height="20" class="icon" />
-                </svg> Quit
+
+            <button type="button" class="btn btn--quit" onclick="window.quit()">
+                <span>Quit</span>
             </button>
-            -->
-            <button type="button" class="btn" onclick="window.quit()">Quit</button>
-        </div>
-        <div class="copyright-container">
-            <p id="copyright" onclick="browser('https://www.phoenixthrush.com')">Made By Lulu</p>
-            <p id="copyright-img" onclick="browser()"></p>
-            <p id="copyright-audio" onclick="browser_audio()"></p>
-        </div>
-    </div>
-    <!-- Fallback audio if offline or unreachable -->
-    <audio id="audio-player" src="assets/audio/keygen-Uh-p3TOIrOc.mp3" loop autoplay></audio>
-    <script src="assets/js/audio.js"></script>
-    <script src="assets/js/wallpaper.js"></script>
+        </section>
+
+        <footer class="footer">
+            <button type="button" class="link-btn" onclick="browser('https://www.phoenixthrush.com')"
+                aria-label="Made by Lulu - Visit website">
+                Made By Lulu
+            </button>
+            <button type="button" class="link-btn" id="image-credit" onclick="browser()" aria-label="Image source">
+                Image Source
+            </button>
+            <button type="button" class="link-btn" id="audio-credit" onclick="browser_audio()"
+                aria-label="Audio source">
+                Audio Source
+            </button>
+        </footer>
+    </main>
+
+    <audio id="audio-player" preload="none" aria-label="Background music">
+        <source src="assets/audio/keygen-Uh-p3TOIrOc.mp3" type="audio/mpeg">
+        Your browser does not support audio playback.
+    </audio>
+
+    <script src="assets/js/app.js" defer></script>
 </body>
 
 </html>

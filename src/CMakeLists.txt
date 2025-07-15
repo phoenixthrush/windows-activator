@@ -53,7 +53,7 @@ if(MINGW OR WIN32)
   if(OHOOK_BUILT)
     add_dependencies(activator ohook)
   endif()
-  target_link_libraries(activator PRIVATE webview::core_static urlmon)
+  target_link_libraries(activator PRIVATE webview::core_static urlmon wininet)
 else()
   add_executable(activator
     main.c
