@@ -6,6 +6,3 @@ License: Public Domain
 
 https://en.m.wikipedia.org/wiki/File:Microsoft_365_(2022).svg
 License: Public Domain
-
-https://en.m.wikipedia.org/wiki/File:Vmware_workstation_16_icon.svg
-License: Public Domain

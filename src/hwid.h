@@ -1,16 +1,10 @@
-// this will be optimised and rewritten
-
 #ifndef HWID_H
 #define HWID_H
 
-#include <windows.h>
-#include <stdio.h>
 #include "webview/webview.h"
 
-char *get_edition_id();
-char *get_license_key(const char *edition_id);
-char *get_os_product_pfn();
-void set_compatibility_mode(const char *exe_path);
-void activate_cb(const char *seq, const char *req, void *arg);
+// This callback is the module's only public entry point. Its helper functions
+// stay private to hwid.c so the rest of the application has a small API.
+void webview_windows_activation_callback(const char *seq, const char *req, void *arg);
 
 #endif // HWID_H

@@ -1,13 +1,9 @@
-// this will be optimised and rewritten
-
 #ifndef VS_H
 #define VS_H
 
-#include <windows.h>
-#include "common.h"
 #include "webview/webview.h"
-#include "common.h"
 
-void vs_cb(const char *seq, const char *req, void *arg);
+// The UI reaches this module through one well-defined callback.
+void webview_visual_studio_activation_callback(const char *seq, const char *req, void *arg);
 
 #endif // VS_H
